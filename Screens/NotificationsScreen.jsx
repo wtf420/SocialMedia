@@ -10,7 +10,7 @@ import {
   Image
 } from "react-native";
 import Icon, { Icons } from "../components/ui/Icons";
-// import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getTimeToNow } from "../utils/Utils";
 import { getAStatusPostById } from "../api/statusPostApi";
 import { Toast } from "../components/ui/Toast";
@@ -20,11 +20,11 @@ import { clearStorySub, pushStorySub } from "../reducers/StoryReducer";
 import { getStoryById } from "../api/storyApi";
 
 export default function NotificationsScreen(/*{ navigation }*/) {
-  // const NotificationsData = useSelector(state => state.notifications.arr);
+  const NotificationsData = useSelector(state => state.notifications.arr);
 
-  // const uid = useSelector(state => state.uid.id);
-  // const jwt = useSelector(state => state.token.key);
-  // const dispatch = useDispatch();
+  const uid = useSelector(state => state.uid.id);
+  const jwt = useSelector(state => state.token.key);
+  const dispatch = useDispatch();
 
   const navigateToDetail = id => {
     getAStatusPostById(jwt, id)
@@ -46,27 +46,27 @@ export default function NotificationsScreen(/*{ navigation }*/) {
 
   useEffect(() => {
     const readNotifi = async () => {
-      // const response = await readNotification(uid, jwt);
-      // if (response.status !== 204) {
-      //   console.log(response.status);
-      //   console.log(response.data.errorMessage);
-      // }
+      const response = await readNotification(uid, jwt);
+      if (response.status !== 204) {
+        console.log(response.status);
+        console.log(response.data.errorMessage);
+      }
     };
     readNotifi();
   }, []);
 
   const getAStoryById = async link => {
     try {
-      // const response = await getStoryById(link, jwt);
-      // if (response.status === 200) {
-      //   const data = response.data;
-      //   await dispatch(pushStorySub(data));
-      //   navigation.push("story", { index: 0, type: 1 });
-      // } else {
-      //   console.log(response.status);
-      //   console.log(response.data.errorMessage);
-      //   throw new Error(response.data.errorMessage);
-      // }
+      const response = await getStoryById(link, jwt);
+      if (response.status === 200) {
+        const data = response.data;
+        await dispatch(pushStorySub(data));
+        navigation.push("story", { index: 0, type: 1 });
+      } else {
+        console.log(response.status);
+        console.log(response.data.errorMessage);
+        throw new Error(response.data.errorMessage);
+      }
     } catch (error) {
       Toast(error.message);
     }
@@ -74,26 +74,26 @@ export default function NotificationsScreen(/*{ navigation }*/) {
 
   const CTA = ({ title, item }) => (
     <TouchableOpacity
-      // onPress={() => {
-      //   if (item.notificationType === "Comment") navigateToDetail(item.link);
-      //   if (item.notificationType === "FriendRequest")
-      //     navigation.navigate("invitations");
-      //   if (item.notificationType === "NewStory") {
-      //     console.log(item.link);
-      //     dispatch(clearStorySub());
-      //     getAStoryById(item.link);
-      //   }
-      // }}
-      // style={{
-      //   borderRadius: 50,
-      //   borderColor: "#0077B5",
-      //   borderWidth: 1,
-      //   paddingHorizontal: 10,
-      //   paddingVertical: 5,
-      //   marginTop: 10,
-      //   alignSelf: "flex-start",
-      //   width: "auto"
-      // }}
+      onPress={() => {
+        if (item.notificationType === "Comment") navigateToDetail(item.link);
+        if (item.notificationType === "FriendRequest")
+          navigation.navigate("invitations");
+        if (item.notificationType === "NewStory") {
+          console.log(item.link);
+          dispatch(clearStorySub());
+          getAStoryById(item.link);
+        }
+      }}
+      style={{
+        borderRadius: 50,
+        borderColor: "#0077B5",
+        borderWidth: 1,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        marginTop: 10,
+        alignSelf: "flex-start",
+        width: "auto"
+      }}
     >
       <Text style={{ fontSize: 16, color: "#0077B5" }}>{title}</Text>
     </TouchableOpacity>
@@ -190,7 +190,7 @@ export default function NotificationsScreen(/*{ navigation }*/) {
         backgroundColor: "white"
       }}
     >
-      {/* {NotificationsData.length === 0 ? (
+      {NotificationsData.length === 0 ? (
         <View
           style={{
             backgroundColor: "transparent",
@@ -216,7 +216,7 @@ export default function NotificationsScreen(/*{ navigation }*/) {
           renderItem={NotificationItem}
           ListFooterComponent={() => <ShowAllFooter />}
         />
-      )} */}
+      )}
     </View>
   );
 }

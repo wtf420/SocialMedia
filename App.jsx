@@ -3,9 +3,10 @@ import { StyleSheet, Text, View } from "react-native";
 import LoginScreen from "./Screens/LoginScreen";
 import ChangePassCreen from "./Screens/ChangePassScreen";
 import SignUpHrScreen from "./Screens/SignUpScreen";
+import NotificationsScreen from "./Screens/NotificationsScreen";
 
 export default function App() {
-    return SignUpHrScreen();
+    return NotificationsScreen();
 }
 
 const styles = StyleSheet.create({
