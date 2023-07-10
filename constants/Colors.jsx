@@ -46,4 +46,4 @@ export default {
     bag10Bg: '#979dc1',
     bag11Bg: '#c7d3c0',
   };
-  
+

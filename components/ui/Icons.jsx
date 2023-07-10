@@ -27,11 +27,13 @@ export const Icons = {
   Foundation,
   EvilIcons,
   Fontisto,
+
 };
 
 const Icon = ({ type, name, color, size = 24, style }) => {
   const fontSize = 24;
   const Tag = Icons[type];
+
   return (
     <>
       {type && name && (
