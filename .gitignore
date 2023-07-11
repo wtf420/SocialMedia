@@ -15,3 +15,7 @@ Frontend/.DS_Store
 
 # Temporary files created by Metro to check the health of the file watcher
 Frontend/.metro-health-check*
+
+# Backend
+backend/node_modules
+backend/config/product_config.env
