@@ -11,7 +11,7 @@ import React, { useState } from "react";
 import { Toast } from "../components/ui/Toast";
 //   import {changePassword} from '../api/Utils';
 // import { useDispatch } from "react-redux";
-//   import {setStatus} from '../reducers/LoadingReducer';
+import { setStatus } from "../reducers/LoadingReducer";
 
 export default function ChangePassCreen(props) {
     // const { handleCloseModal } = props;
@@ -78,7 +78,7 @@ export default function ChangePassCreen(props) {
                 oldPassword: passwordCurrent,
                 newPassword: passwordNew,
             };
-            const response = await changePassword(data);
+            // const response = await changePassword(data);
             if (response.status === 204) {
                 Toast("Change password successfully!");
                 // handleCloseModal();
@@ -146,10 +146,10 @@ export default function ChangePassCreen(props) {
                         onPressIn={() => setShowPassCurrent(true)}
                         onPressOut={() => setShowPassCurrent(false)}
                     >
-                        {/*<Image
+                        <Image
                             source={require("../assets/images/eye.png")}
                             style={{ width: 25, height: 16.67 }}
-                />*/}
+                        />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -193,10 +193,10 @@ export default function ChangePassCreen(props) {
                         onPressIn={() => setShowPassNew(true)}
                         onPressOut={() => setShowPassNew(false)}
                     >
-                        {/* <Image
+                        <Image
                             source={require("../assets/images/eye.png")}
                             style={{ width: 25, height: 16.67 }}
-                /> */}
+                        />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -239,10 +239,10 @@ export default function ChangePassCreen(props) {
                         onPressIn={() => setShowPassConfirm(true)}
                         onPressOut={() => setShowPassConfirm(false)}
                     >
-                        {/* <Image
+                        <Image
                             source={require("../assets/images/eye.png")}
                             style={{ width: 25, height: 16.67 }}
-                        /> */}
+                        />
                     </TouchableOpacity>
                 </View>
             </View>
