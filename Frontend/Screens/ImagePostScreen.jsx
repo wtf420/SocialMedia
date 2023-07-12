@@ -1,28 +1,28 @@
-import React, { useRef } from "react";
 import {
   View,
   Animated,
   useWindowDimensions,
   StyleSheet,
   SafeAreaView,
-  TouchableOpacity,
-  Image,
-} from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
-import Icon, { Icons } from "../components/ui/Icons";
-import Colors from "../constants/Colors";
+  TouchableOpacity
+} from "react-native"
+import React, { useRef } from "react"
+import { Image } from "react-native"
+import Colors from "../constants/Colors"
+import { ScrollView } from "react-native-gesture-handler"
+import Icon, { Icons } from "../components/ui/Icons"
 
-export default function ImagesPostScreen(/*{ navigation: { goBack }, route }*/) {
-  const scrollX = useRef(new Animated.Value(0)).current;
-  let { width: windowWidth, height: windowHeight } = useWindowDimensions();
-  windowHeight = windowHeight - 150;
+export default function ImagesPostScreen({ navigation: { goBack }, route }) {
+  const scrollX = useRef(new Animated.Value(0)).current
+  let { width: windowWitdh, height: windowHeight } = useWindowDimensions()
+  windowHeight = windowHeight - 150
 
-  // const { images } = route.params;
+  const { images } = route.params
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ position: "absolute", top: 10, left: 10 }}>
-        <TouchableOpacity /*onPress={goBack}*/>
+        <TouchableOpacity onPress={goBack}>
           <Icon
             type={Icons.Feather}
             name="arrow-left"
@@ -41,43 +41,43 @@ export default function ImagesPostScreen(/*{ navigation: { goBack }, route }*/) 
             { useNativeDriver: false }
           )}
           scrollEventThrottle={16}
-          contentOffset={{ x: windowWidth * 0, y: 0 }}
+          contentOffset={{ x: windowWitdh * 0, y: 0 }}
         >
-          {/* {images.map((image, imageIndex) => {
+          {images.map((image, imageIndex) => {
             return (
-              <Animated.View style={{ width: windowWidth }} key={imageIndex}>
+              <Animated.View style={{ width: windowWitdh }} key={imageIndex}>
                 <Image
                   source={{ uri: image.location }}
                   style={styles.card}
                   resizeMode="contain"
                 />
               </Animated.View>
-            );
-          })} */}
+            )
+          })}
         </ScrollView>
       </View>
 
       <View style={styles.indicatorContainer}>
-        {/* {images.map((image, imageIndex) => {
+        {images.map((image, imageIndex) => {
           const width = scrollX.interpolate({
             inputRange: [
-              windowWidth * (imageIndex - 1),
-              windowWidth * imageIndex,
-              windowWidth * (imageIndex + 1),
+              windowWitdh * (imageIndex - 1),
+              windowWitdh * imageIndex,
+              windowWitdh * (imageIndex + 1)
             ],
             outputRange: [8, 16, 8],
-            extrapolate: "clamp",
-          });
+            extrapolate: "clamp"
+          })
           return (
             <Animated.View
               style={[styles.normalDots, { width }]}
               key={imageIndex}
             />
-          );
-        })} */}
+          )
+        })}
       </View>
     </SafeAreaView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Colors.black,
+    backgroundColor: Colors.black
   },
   scrollContainer: {},
   card: {
@@ -93,18 +93,18 @@ const styles = StyleSheet.create({
     width: "95%",
     marginVertical: 10,
     overflow: "hidden",
-    alignSelf: "center",
+    alignSelf: "center"
   },
   indicatorContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "center"
   },
   normalDots: {
     width: 8,
     height: 8,
     borderRadius: 4,
     backgroundColor: Colors.purple,
-    marginHorizontal: 4,
-  },
-});
+    marginHorizontal: 4
+  }
+})
