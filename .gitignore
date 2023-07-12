@@ -19,3 +19,4 @@ Frontend/.metro-health-check*
 # Backend
 backend/node_modules
 backend/config/product_config.env
+node_modules
