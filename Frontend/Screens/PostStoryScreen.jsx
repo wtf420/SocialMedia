@@ -9,7 +9,8 @@ import {
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {Toast} from '../components/ui/Toast';
-import ImagePicker from 'react-native-image-crop-picker';
+import * as ImagePicker from 'expo-image-picker';
+import { ToastAndroid } from 'react-native';
 import {createThumbnail} from 'react-native-create-thumbnail';
 import Icon, {Icons} from '../components/ui/Icons';
 import VideoPlayer from 'react-native-video';
@@ -31,29 +32,35 @@ export default function PostStoryScreen({navigation}) {
     navigation.goBack();
   };
 
-  const choosePhotoFromLibrary = () => {
-    ImagePicker.openPicker({
-      waitAnimationEnd: false,
-      compressImageQuality: 0.8,
-      maxFiles: 10,
-    })
-      .then(images => {
+  const choosePhotoFromLibrary = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        ToastAndroid.show('Permission to access media library denied', ToastAndroid.SHORT);
+        return;
+      }
+  
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.8,
+        maxFiles: 10,
+      });
+  
+      if (!result.cancelled) {
         const selectedMedia = {
-          uri: images.path,
-          type: images.mime,
-          name: images.path.split('/').pop() || images.path,
+          uri: result.uri,
+          type: result.type,
+          name: result.uri.split('/').pop(),
         };
         console.log(selectedMedia);
         setMediaFiles(selectedMedia);
-        // image/jpeg
-        // video/mp4
-      })
-      .catch(error => {
-        navigateBack();
-        Toast(error.message);
-      });
+      }
+    } catch (error) {
+      ToastAndroid.show(error.message, ToastAndroid.SHORT);
+    }
   };
-
   useEffect(() => {
     choosePhotoFromLibrary();
   }, []);

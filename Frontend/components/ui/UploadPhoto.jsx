@@ -2,7 +2,8 @@
 import React from "react"
 import { Pressable, StyleSheet, Text, View } from "react-native"
 import Modal from "react-native-modal"
-import ImagePicker from "react-native-image-crop-picker"
+import * as ImagePicker from 'expo-image-picker';
+import { ToastAndroid } from 'react-native';
 import Colors from "../../constants/Colors"
 import { Toast } from "./Toast"
 
@@ -26,23 +27,31 @@ function UploadPhoto(props) {
       })
       .catch(error => Toast(error.message))
   }
-  const choosePhotoFromLibrary = () => {
-    toggleModal()
-    ImagePicker.openPicker({
-      height: props.height,
-      width: props.width,
-      waitAnimationEnd: false,
-      compressImageQuality: 0.8,
-      cropping: true,
-      cropperCircleOverlay: props.isCirle
-    })
-      .then(image => {
-        props.postImage(image)
-        // console.log(image);
-        // props.setPhoto(image.path);
-      })
-      .catch(error => Toast(error.message))
-  }
+  const choosePhotoFromLibrary = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        ToastAndroid.show('Permission to access media library denied', ToastAndroid.SHORT);
+        return;
+      }
+  
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [props.width, props.height],
+        quality: 0.8,
+      });
+  
+      if (!result.cancelled) {
+        props.postImage(result);
+        // console.log(result);
+        // props.setPhoto(result.uri);
+      }
+    } catch (error) {
+      ToastAndroid.show(error.message, ToastAndroid.SHORT);
+    }
+  };
+  
 
   return (
     <Modal
