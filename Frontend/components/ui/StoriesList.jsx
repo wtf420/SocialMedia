@@ -76,10 +76,9 @@ const CreateStoryComponent = (props) => {
       />
       <Animated.Image
         source={
-          //avatarUrl
-            //? { uri: avatarUrl }: 
-            //require
-            ('../../assets/images/icon.png')
+          avatarUrl
+            ? { uri: avatarUrl }
+            : require('../../assets/icon.png')
         }
         resizeMode="cover"
         style={[
@@ -231,10 +230,9 @@ const Story = (props) => {
       >
         <Image
           source={
-            //content.author.profileImagePath
-              //? { uri: content.author.profileImagePath }:
-               //require
-               ('../../assets/images/icon.png')
+            content.author.profileImagePath
+              ? { uri: content.author.profileImagePath }
+              : require('../../assets/icon.png')
           }
           style={styles.avatar}
           resizeMode="cover"
@@ -255,7 +253,9 @@ const StoriesList = ({ navigation }) => {
   const x = useRef(new Animated.Value(0)).current;
 
   function onScrollEndDrag(e) {
-    const { contentOffset } = e.nativeEvent;
+    const { contentOffset } = e.nativeEvent
+
+;
     if (contentOffset.x < 50) {
       if (scrollStories.current) {
         scrollStories.current.scrollToIndex({
@@ -417,4 +417,3 @@ const styles = StyleSheet.create({
 });
 
 export default StoriesList;
-
