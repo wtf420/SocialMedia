@@ -10,62 +10,62 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-//import ActivitySection from '../components/ui/ActivitySection';
-//import UploadPhoto from '../components/UploadPhoto';
+import ActivitySection from '../components/ui/ActivitySection';
+import UploadPhoto from '../components/ui/UploadPhoto';
 
-//import EditProfileScreen from './EditProfileScreen';
-//import {useDispatch, useSelector} from 'react-redux';
-//import {RootState} from '../reducers/Store';
-//import {postAvatarImg, postBackgrImg, userLogout} from '../api/userApi';
-//import {nameStorage, storeData} from '../reducers/AsyncStorage';
-//import {setStatus} from '../reducers/LoadingReducer';
-//import {updateAvatar, updateBackground} from '../reducers/UserReducer';
+import EditProfileScreen from './EditProfileScreen';
+import {useDispatch, useSelector} from 'react-redux';
+import {RootState} from '../reducers/Store';
+import {postAvatarImg, postBackgrImg, userLogout} from '../api/userApi';
+import {nameStorage, storeData} from '../reducers/AsyncStorage';
+import {setStatus} from '../reducers/LoadingReducer';
+import {updateAvatar, updateBackground} from '../reducers/UserReducer';
 import Colors from '../constants/Colors';
-//import {Toast} from '../components/ui/Toast';
-//import {clearStatusPostsSub} from '../reducers/StatusPostReducer';
+import {Toast} from '../components/ui/Toast';
+import {clearStatusPostsSub} from '../reducers/StatusPostReducer';
 import Icon, {Icons} from '../components/ui/Icons';
-//import {clearStorySub, pushStorySub} from '../reducers/StoryReducer';
-//import {getAllStory} from '../api/storyApi';
-//import {useIsFocused} from '@react-navigation/native';
+import {clearStorySub, pushStorySub} from '../reducers/StoryReducer';
+import {getAllStory} from '../api/storyApi';
+import {useIsFocused} from '@react-navigation/native';
 
 const screenWidth = Dimensions.get('window').width;
 
-function ProfileScreen(/*{navigation}*/) {
+function ProfileScreen({navigation}) {
   const [isModalVisible, setModalVisible] = useState(false);
   const [isModelBackGrVisible, setIsModelBackGrVisible] = useState(false);
 
   const [editProfile, setEditProfile] = useState(false);
 
-  // const user = useSelector((state) => state.userInfo);
-  // const token = useSelector((state) => state.token.key);
-  // const uid = useSelector((state) => state.uid.id);
+  const user = useSelector((state) => state.userInfo);
+  const token = useSelector((state) => state.token.key);
+  const uid = useSelector((state) => state.uid.id);
 
-  //const dispatch = useDispatch();
-  //const [followCount, setFollowCount] = useState(user.followers.length);
-  //const isFocused = useIsFocused();
+  const dispatch = useDispatch();
+  const [followCount, setFollowCount] = useState(user.followers.length);
+  const isFocused = useIsFocused();
 
   const handleLogout = async () => {
-    // userLogout(token)
-    //   .then((response) => {
-    //     if (response.status === 204) {
-    //       console.log(response);
-    //       storeData(false, nameStorage.isLogin)
-    //         .then(() => {
-    //           /*navigation.reset({
-    //             index: 0,
-    //             routes: [{name: 'login'}],
-    //           })*/;
-    //         })
-    //         .catch(error => {
-    //           console.error(error);
-    //         });
-    //     } else {
-    //       throw new Error('Logout failed.');
-    //     }
-    //   })
-    //   .catch(error => {
-    //     Toast(error.message);
-    //   });
+    userLogout(token)
+      .then((response) => {
+        if (response.status === 204) {
+          console.log(response);
+          storeData(false, nameStorage.isLogin)
+            .then(() => {
+              navigation.reset({
+                index: 0,
+                routes: [{name: 'login'}],
+              });
+            })
+            .catch(error => {
+              console.error(error);
+            });
+        } else {
+          throw new Error('Logout failed.');
+        }
+      })
+      .catch(error => {
+        Toast(error.message);
+      });
   };
 
   const postImage = (image) => {
@@ -75,24 +75,24 @@ function ProfileScreen(/*{navigation}*/) {
       type: image.mime,
       name: image.filename || 'profile-image',
     });
-    //dispatch(setStatus(true));
-    // postAvatarImg(dataForm, uid, token)
-    //   .then((response) => {
-    //     if (response.status === 200) {
-    //       console.log(response.data);
-    //       return response.data;
-    //     } else {
-    //       console.log(response.status);
-    //       throw new Error(response.data.errorMessage);
-    //     }
-    //   })
-    //   .then((data) => {
-    //     dispatch(updateAvatar(data.imagePath));
-    //   })
-    //   .catch(error => Toast(error.message))
-    //   .finally(() => {
-    //     dispatch(setStatus(false));
-    //   });
+    dispatch(setStatus(true));
+    postAvatarImg(dataForm, uid, token)
+      .then((response) => {
+        if (response.status === 200) {
+          console.log(response.data);
+          return response.data;
+        } else {
+          console.log(response.status);
+          throw new Error(response.data.errorMessage);
+        }
+      })
+      .then((data) => {
+        dispatch(updateAvatar(data.imagePath));
+      })
+      .catch(error => Toast(error.message))
+      .finally(() => {
+        dispatch(setStatus(false));
+      });
   };
 
   const postBackgroundImage = (image) => {
@@ -102,74 +102,74 @@ function ProfileScreen(/*{navigation}*/) {
       type: image.mime,
       name: image.filename || 'profile-image',
     });
-    //dispatch(setStatus(true));
-    // postBackgrImg(dataForm, uid, token)
-    //   .then((response) => {
-    //     if (response.status === 200) {
-    //       console.log(response.data);
-    //       return response.data;
-    //     } else {
-    //       console.log(response.status);
-    //       throw new Error(response.data.errorMessage);
-    //     }
-    //   })
-    //   .then((data) => {
-    //     dispatch(updateBackground(data.backgroundImagePath));
-    //   })
-    //   .catch(error => Toast(error.message))
-    //   .finally(() => {
-    //     dispatch(setStatus(false));
-    //   });
+    dispatch(setStatus(true));
+    postBackgrImg(dataForm, uid, token)
+      .then((response) => {
+        if (response.status === 200) {
+          console.log(response.data);
+          return response.data;
+        } else {
+          console.log(response.status);
+          throw new Error(response.data.errorMessage);
+        }
+      })
+      .then((data) => {
+        dispatch(updateBackground(data.backgroundImagePath));
+      })
+      .catch(error => Toast(error.message))
+      .finally(() => {
+        dispatch(setStatus(false));
+      });
   };
 
-  // useEffect(() => {
-  //   const getStory = async () => {
-  //     const response = await getAllStory(uid, token);
-  //     if (response.status === 200) {
-  //       const data = response.data;
-  //       for (const story of data) {
-  //         dispatch(pushStorySub(story));
-  //       }
-  //     } else {
-  //       console.log(response.status);
-  //     }
-  //   };
-  //   // if (isFocused) {
-  //   //   dispatch(clearStorySub());
-  //   //   getStory();
-  //   // }
-  // }, /*[isFocused]*/);
+  useEffect(() => {
+    const getStory = async () => {
+      const response = await getAllStory(uid, token);
+      if (response.status === 200) {
+        const data = response.data;
+        for (const story of data) {
+          dispatch(pushStorySub(story));
+        }
+      } else {
+        console.log(response.status);
+      }
+    };
+    if (isFocused) {
+      dispatch(clearStorySub());
+      getStory();
+    }
+  }, [isFocused]);
 
   return (
     <ScrollView contentContainerStyle={{flexGrow: 1}}>
       <View style={styles.container}>
-        {/* <UploadPhoto
+        <UploadPhoto
           isVisible={isModalVisible}
           setVisible={setModalVisible}
           height={140}
           width={140}
           isCirle={true}
           postImage={postImage}
-        /> */}
-        {/* <UploadPhoto
+        />
+        <UploadPhoto
           isVisible={isModelBackGrVisible}
           setVisible={setIsModelBackGrVisible}
           height={120}
           width={screenWidth}
           isCirle={false}
           postImage={postBackgroundImage}
-        /> */}
-        {/* <EditProfileScreen
+        />
+        <EditProfileScreen
           isVisible={editProfile}
           setVisible={setEditProfile}
-        /> */}
+        />
         <View style={styles.backgroundAvatarContainer}>
           <Image
-            // source={
-            //   user.backgroundImagePath
-            //     ? {uri: user.backgroundImagePath}
-            //     : require('../assets/images/DefaultBackgroundAvatar.jpg')
-            // }
+            source={
+              user.backgroundImagePath
+                ? {uri: user.backgroundImagePath}
+                : require('../assets/images/DefaultBackgroundAvatar.jpg')
+            }
             style={styles.backgroundAvatarImage}
           />
           <View style={{position: 'absolute', top: 10, right: 5}}>
@@ -199,11 +199,11 @@ function ProfileScreen(/*{navigation}*/) {
           }}>
           <View style={styles.avatarContainer}>
             <Image
-              // source={
-              //   user.profileImagePath
-              //     ? {uri: user.profileImagePath}
-              //     : require('../assets/images/Spiderman.jpg')
-              // }
+              source={
+                user.profileImagePath
+                  ? {uri: user.profileImagePath}
+                  : require('../assets/images/Spiderman.jpg')
+              }
               style={styles.avatarImage}
             />
             <View style={styles.buttonAddImageOuter}>
@@ -230,14 +230,14 @@ function ProfileScreen(/*{navigation}*/) {
           </TouchableOpacity>
         </View>
         <View>
-          {/* <Text style={styles.textName}>{user.name}</Text> */}
-          {/* {user.headline && (
+          <Text style={styles.textName}>{user.name}</Text>
+          {user.headline && (
             <Text
               style={[styles.textName, {fontSize: 18, fontWeight: 'normal'}]}>
               {user.headline}
             </Text>
-          )} */}
-          {/* {user.workingPlace && (
+          )}
+          {user.workingPlace && (
             <Text
               style={[
                 styles.textName,
@@ -245,9 +245,9 @@ function ProfileScreen(/*{navigation}*/) {
               ]}>
               {user.workingPlace}
             </Text>
-          )} */}
+          )}
           {/* Chỗ này nó k chỉnh font weight được nên t phải để cái này, sau này tự thêm font của mình vào r thì ms chỉnh font weight được */}
-          {/* {user.location && (
+          {user.location && (
             <Text
               style={[
                 styles.textName,
@@ -255,7 +255,7 @@ function ProfileScreen(/*{navigation}*/) {
               ]}>
               {user.location}
             </Text>
-          )} */}
+          )}
           <Text
             style={[
               styles.textName,
@@ -266,18 +266,18 @@ function ProfileScreen(/*{navigation}*/) {
                 marginTop: 10,
               },
             ]}>
-            {/* {`${user.connections.length} connections`} */}
+            {`${user.connections.length} connections`}
           </Text>
 
           <View
             style={{backgroundColor: '#E9E5DF', height: 5, marginTop: 10}}
           />
           <View>
-            {/* <ActivitySection
+            <ActivitySection
               navigation={navigation}
               userId={uid}
               followCount={followCount}
-            /> */}
+            />
           </View>
         </View>
         <View
