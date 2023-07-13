@@ -21,7 +21,7 @@ import {
   import ForgetPassScreen from "./ForgetPassScreen"
 //   import ChangePassScreen from "./ChangePassScreen"
   
-  function FirstTimeUseScreen({ navigation }) {
+  function FirstTimeUseScreen(/*{ navigation }*/) {
     const [modalHrVisible, setModalHrVisible] = useState(false)
     const [modalLoginVisible, setModalLoginVisible] = useState(false)
     const [modalForgetPassVisible, setModalForgetPassVisible] = useState(false)
@@ -44,7 +44,7 @@ import {
     }
   
     const navigateToMain = jwt => {
-      navigation.navigate("loading", { jwt })
+      // navigation.navigate("loading", { jwt })
     }
   
     useEffect(() => {

@@ -9,12 +9,12 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { Toast } from "../components/ui/Toast";
-//   import {changePassword} from '../api/Utils';
-// import { useDispatch } from "react-redux";
+import {changePassword} from '../api/Utils';
+import { useDispatch } from "react-redux";
 import { setStatus } from "../reducers/LoadingReducer";
 
 export default function ChangePassCreen(props) {
-    // const { handleCloseModal } = props;
+    const { handleCloseModal } = props;
 
     const [passwordCurrent, setPasswordCurrent] = useState("");
     const [showPassCurrent, setShowPassCurrent] = useState(false);
@@ -66,29 +66,29 @@ export default function ChangePassCreen(props) {
         return true;
     };
 
-    // const dispatch = useDispatch();
+    const dispatch = useDispatch();
 
     const handleChange = async () => {
         if (!checkInfo()) return;
 
-        // dispatch(setStatus(true));
+        dispatch(setStatus(true));
         try {
             const data = {
                 email: email,
                 oldPassword: passwordCurrent,
                 newPassword: passwordNew,
             };
-            // const response = await changePassword(data);
+            const response = await changePassword(data);
             if (response.status === 204) {
                 Toast("Change password successfully!");
-                // handleCloseModal();
+                handleCloseModal();
             } else {
                 throw new Error(response.data.message);
             }
         } catch (error) {
             Toast(error.message);
         } finally {
-            // dispatch(setStatus(false));
+            dispatch(setStatus(false));
         }
     };
 

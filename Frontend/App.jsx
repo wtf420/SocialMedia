@@ -1,27 +1,24 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-import ChatRoom from "./Screens/chatScreens/ChatRoom";
-import ChatScreen from "./Screens/chatScreens/ChatScreen";
-import VideoCallScreen from "./Screens/chatScreens/VideoCallScreen";
-import ChangePassCreen from "./Screens/ChangePassScreen";
-import DetailStatusScreen from "./Screens/DetailStatusScreen";
-import EditPostScreen from "./Screens/EditPostScreen";
-import EditProfileScreen from "./Screens/EditProfileScreen";
-import FirstTimeUserScreen from "./Screens/FirstTimeUseScreen";
-import LoginScreen from "./Screens/LoginScreen";
-import SignUpHrScreen from "./Screens/SignUpScreen";
-import NotificationsScreen from "./Screens/NotificationsScreen";
+import React, { useEffect } from "react"
+import { Provider } from "react-redux"
+import { Store } from "./reducers/Store"
+import { NavigationContainer } from "@react-navigation/native"
+import Routers from "./Navigations/Routers"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 
+const App = () => {
+  useEffect(() => {
+    // registerGlobals();
+  }, [])
 
-export default function App() {
-    return FirstTimeUserScreen();
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Provider store={Store}>
+        <NavigationContainer>
+          <Routers />
+        </NavigationContainer>
+      </Provider>
+    </GestureHandlerRootView>
+  )
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#fff",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-});
+export default App

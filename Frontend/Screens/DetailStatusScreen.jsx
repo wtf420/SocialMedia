@@ -14,17 +14,17 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import Icon, { Icons } from "../components/ui/Icons";
 import Colors from "../constants/Colors";
-//   import {useDispatch, useSelector} from 'react-redux';
+  import {useDispatch, useSelector} from 'react-redux';
 import { RootState } from "../reducers/Store";
 import { Toast } from "../components/ui/Toast";
-// import ImagePicker from "react-native-image-crop-picker";
-//   import {
-//     createComment,
-//     deleteComment,
-//     getAllComments,
-//   } from '../api/statusCommentApi';
-// import ItemComment from "../components/ui/ItemComment";
-// import ShowPosts from "../components/ui/ShowPosts";
+import ImagePicker from "react-native-image-crop-picker";
+  import {
+    createComment,
+    deleteComment,
+    getAllComments,
+  } from '../api/statusCommentApi';
+import ItemComment from "../components/ui/ItemComment";
+import ShowPosts from "../components/ui/ShowPosts";
 import {
     decrementComment,
     deleteAStatusPost,
@@ -41,14 +41,14 @@ export default function DetailStatusScreen(navigation, route) {
     const uid = useSelector((state) => state.uid.id);
     const token = useSelector((state) => state.token.key);
 
-    // const { idPost } = route.params;
+    const { idPost } = route.params;
 
-    // const item = useSelector((state) => {
-    //     return (
-    //         state.statusPost.HomePage.find((item) => item._id === idPost) ||
-    //         state.statusPost.sub.find((item) => item._id === idPost)
-    //     );
-    // });
+    const item = useSelector((state) => {
+        return (
+            state.statusPost.HomePage.find((item) => item._id === idPost) ||
+            state.statusPost.sub.find((item) => item._id === idPost)
+        );
+    });
 
     const [comment, setComment] = useState("");
 
@@ -60,22 +60,22 @@ export default function DetailStatusScreen(navigation, route) {
 
     const commentRef = useRef < TextInput > null;
 
-    // const dispatch = useDispatch();
+    const dispatch = useDispatch();
 
-    // const handleDelete = async (idPost) => {
-    //     try {
-    //         const response = await deleteAStatusPostApi(uid, token, idPost);
-    //         if (response.status === 204) {
-    //             // navigation.goBack();
-    //             // dispatch(deleteAStatusPost(idPost));
-    //             Toast("Delete Success");
-    //         } else {
-    //             Toast("Delete Fail");
-    //         }
-    //     } catch (error) {
-    //         Toast(error);
-    //     }
-    // };
+    const handleDelete = async (idPost) => {
+        try {
+            const response = await deleteAStatusPostApi(uid, token, idPost);
+            if (response.status === 204) {
+                navigation.goBack();
+                dispatch(deleteAStatusPost(idPost));
+                Toast("Delete Success");
+            } else {
+                Toast("Delete Fail");
+            }
+        } catch (error) {
+            Toast(error);
+        }
+    };
 
     const handleDeleteComment = async (id) => {
         try {
@@ -124,34 +124,34 @@ export default function DetailStatusScreen(navigation, route) {
     };
 
     const takePhotoFromCamera = () => {
-        // ImagePicker.openCamera({
-        //     // height: 140,
-        //     // width: 140,
-        //     // cropperCircleOverlay: true,
-        // })
-        //     .then((image) => {
-        //         setMediaFile({
-        //             uri: image.path,
-        //             type: image.mime,
-        //             name: image.path.split("/").pop(),
-        //         });
-        //     })
-        //     .catch((error) => Toast(error.message));
+        ImagePicker.openCamera({
+            height: 140,
+            width: 140,
+            cropperCircleOverlay: true,
+        })
+            .then((image) => {
+                setMediaFile({
+                    uri: image.path,
+                    type: image.mime,
+                    name: image.path.split("/").pop(),
+                });
+            })
+            .catch((error) => Toast(error.message));
     };
 
     const choosePhotoFromLibrary = () => {
-        // ImagePicker.openPicker({
-        //     waitAnimationEnd: false,
-        //     compressImageQuality: 0.8,
-        // })
-        //     .then((image) => {
-        //         setMediaFile({
-        //             uri: image.path,
-        //             type: image.mime,
-        //             name: image.path.split("/").pop() || image.path,
-        //         });
-        //     })
-        //     .catch((error) => Toast(error.message));
+        ImagePicker.openPicker({
+            waitAnimationEnd: false,
+            compressImageQuality: 0.8,
+        })
+            .then((image) => {
+                setMediaFile({
+                    uri: image.path,
+                    type: image.mime,
+                    name: image.path.split("/").pop() || image.path,
+                });
+            })
+            .catch((error) => Toast(error.message));
     };
 
     const getComments = async () => {
@@ -216,7 +216,7 @@ export default function DetailStatusScreen(navigation, route) {
             >
                 <ShowPosts
                     item={item}
-                    // navigation={navigation}
+                    navigation={navigation}
                     pressComment={() => {
                         commentRef.current?.focus();
                     }}
@@ -230,7 +230,7 @@ export default function DetailStatusScreen(navigation, route) {
                     {comments.map((comment, index) => (
                         <ItemComment
                             statusId={item._id}
-                            // navigation={navigation}
+                            navigation={navigation}
                             item={comment}
                             IdAuthorOfStatus={item.author._id}
                             handleDeleteComment={() => {
@@ -246,7 +246,7 @@ export default function DetailStatusScreen(navigation, route) {
                 <View style={{ margin: 15, flexDirection: "row" }}>
                     <TouchableOpacity
                         onPress={() => {
-                            // navigation.goBack();
+                            navigation.goBack();
                         }}
                         style={{ marginTop: 3 }}
                     >
