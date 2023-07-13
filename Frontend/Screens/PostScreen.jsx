@@ -262,7 +262,7 @@ function PostScreen() {
           <Image
             source={
               user.profileImagePath === ''
-                ? require('../../assets/icon.png')
+                ? require('../assets/images/Spiderman.jpg')
                 : { uri: user.profileImagePath }
             }
             style={{

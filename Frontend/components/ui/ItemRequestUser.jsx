@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import { View, Text, Image, Pressable } from "react-native";
 import React from "react";
-import Colors from "../constants/Colors";
+import Colors from "../../constants/Colors";
 import { TouchableOpacity } from "react-native";
 
 export default function ItemRequestUser({

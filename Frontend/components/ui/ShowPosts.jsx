@@ -9,7 +9,7 @@ import {
   StyleSheet,
   Pressable,
 } from 'react-native';
-import Icon, { Icons } from '../../components/ui/Icons';
+import Icon, { Icons } from './Icons';
 import Colors from '../../constants/Colors';
 import { getTimeToNow } from '../../utils/Utils';
 import { useDispatch, useSelector } from 'react-redux';
