@@ -2,12 +2,12 @@
 import React, { useState } from "react";
 import { Pressable, StyleSheet, Text, View, TextInput } from "react-native";
 import CustomCheckBox from "../components/ui/CustomCheckbox";
-// import { userLogin } from "../api/userApi";
-// import { nameStorage, storeData } from "../reducers/AsyncStorage";
-// import { useDispatch } from "react-redux";
-// import { setToken } from "../reducers/TokenReducer";
-// import { setIdFromJwt } from "../reducers/UidReducer";
-// import { setStatus } from "../reducers/LoadingReducer";
+import { userLogin } from "../api/userApi";
+import { nameStorage, storeData } from "../reducers/AsyncStorage";
+import { useDispatch } from "react-redux";
+import { setToken } from "../reducers/TokenReducer";
+import { setIdFromJwt } from "../reducers/UidReducer";
+import { setStatus } from "../reducers/LoadingReducer";
 import { Toast } from "../components/ui/Toast";
 
 function LoginScreen(props) {
@@ -15,41 +15,41 @@ function LoginScreen(props) {
     const [password, setPassword] = useState("");
     const [isSelected, setSelection] = useState(false);
 
-    // const dispatch = useDispatch();
+    const dispatch = useDispatch();
 
-    // const handleLogin = async () => {
-    //     console.log("login iden " + username + password);
-    //     dispatch(setStatus(true));
-    //     userLogin({
-    //         email: username,
-    //         password: password,
-    //     })
-    //         .then((response) => {
-    //             if (response.status === 200) {
-    //                 return response.data;
-    //             } else {
-    //                 console.log(response.status);
-    //                 throw new Error(response.data.errorMessage);
-    //             }
-    //         })
-    //         .then((data) => {
-    //             // connect to socket
-    //             // require('../utils/socket');
+    const handleLogin = async () => {
+        console.log("login iden " + username + password);
+        dispatch(setStatus(true));
+        userLogin({
+            email: username,
+            password: password,
+        })
+            .then((response) => {
+                if (response.status === 200) {
+                    return response.data;
+                } else {
+                    console.log(response.status);
+                    throw new Error(response.data.errorMessage);
+                }
+            })
+            .then((data) => {
+                // connect to socket
+                // require('../utils/socket');
 
-    //             // do something with the JWT token
-    //             const jwtToken = data;
-    //             storeData(jwtToken, nameStorage.jwtToken);
+                // do something with the JWT token
+                const jwtToken = data;
+                storeData(jwtToken, nameStorage.jwtToken);
 
-    //             storeData(isSelected, nameStorage.isLogin);
-    //             props.handleNavigate(jwtToken);
-    //         })
-    //         .catch((error) => {
-    //             Toast(error.message);
-    //         })
-    //         .finally(() => {
-    //             dispatch(setStatus(false));
-    //         });
-    // };
+                storeData(isSelected, nameStorage.isLogin);
+                props.handleNavigate(jwtToken);
+            })
+            .catch((error) => {
+                Toast(error.message);
+            })
+            .finally(() => {
+                dispatch(setStatus(false));
+            });
+    };
     return (
         <View style={styles.container}>
             <View style={styles.titleView}>
@@ -83,7 +83,7 @@ function LoginScreen(props) {
                     </View>
                     <Text
                         onPress={() => {
-                            // props.handleOpenForgetPass();
+                            props.handleOpenForgetPass();
                         }}
                         style={[
                             styles.fontText,
@@ -105,7 +105,7 @@ function LoginScreen(props) {
                 ]}
             >
                 <Pressable
-                    // onPress={handleLogin}
+                    onPress={handleLogin}
                     style={styles.button}
                     android_ripple={{ color: "#613FC2", borderless: false }}
                 >
