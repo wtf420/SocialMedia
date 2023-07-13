@@ -17,14 +17,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../reducers/Store';
 import { setPostShow } from '../reducers/UtilsReducer';
 import Colors from '../constants/Colors';
-//import ImagePicker from 'react-native-image-crop-picker';
-//import { createNewPost } from '../api/statusPostApi';
+import ImagePicker from 'react-native-image-crop-picker';
+import { createNewPost } from '../api/statusPostApi';
 import { Toast } from '../components/ui/Toast';
 
 import { setStatus } from '../reducers/LoadingReducer';
-//import VideoPlayer from 'react-native-video-controls';
+import VideoPlayer from 'react-native-video-controls';
 
-export function PostScreen() {
+function PostScreen() {
   const [mediaFiles, setMediaFiles] = useState([]);
   const [description, setDescription] = useState('');
 
@@ -102,44 +102,44 @@ export function PostScreen() {
       Toast('Only multiple images can be selected!');
       return;
     }
-    //ImagePicker.openPicker({
-      //multiple: true,
-      //waitAnimationEnd: false,
-      //compressImageQuality: 0.8,
-      //maxFiles: 10,
-      //mediaType: 'photo',
-    //})
-      //.then((images) => {
-        //console.log(images);
-        //const selectedImages = images.map((image) => ({
-        //  uri: image.path,
-        //  type: image.mime,
-         // name: image.path.split('/').pop() || image.path,
-       // }));
-       // setMediaFiles([...mediaFiles, ...selectedImages]);
-      //})
-     // .catch((error) => Toast(error.message));
-  //};
+    ImagePicker.openPicker({
+      multiple: true,
+      waitAnimationEnd: false,
+      compressImageQuality: 0.8,
+      maxFiles: 10,
+      mediaType: 'photo',
+    })
+      .then((images) => {
+        console.log(images);
+        const selectedImages = images.map((image) => ({
+          uri: image.path,
+          type: image.mime,
+          name: image.path.split('/').pop() || image.path,
+        }));
+        setMediaFiles([...mediaFiles, ...selectedImages]);
+      })
+      .catch((error) => Toast(error.message));
+  };
 
-  //const selectVideo = () => {
-    //if (mediaFiles.length > 0 && mediaFiles[0].type === 'image/jpeg') {
-     // Toast('Only multiple images can be selected!');
-     // return;
-    //}
-    //ImagePicker.openPicker({
-      //mediaType: 'video',
-    //})
-      //.then((video) => {
-       // console.log(video);
-       // setMediaFiles([
-          //{
-          //  uri: video.path,
-          //  type: video.mime,
-          //  name: video.path.split('/').pop(),
-         // },
-        //]);
-     // })
-     // .catch((error) => Toast(error.message));
+  const selectVideo = () => {
+    if (mediaFiles.length > 0 && mediaFiles[0].type === 'image/jpeg') {
+      Toast('Only multiple images can be selected!');
+      return;
+    }
+    ImagePicker.openPicker({
+      mediaType: 'video',
+    })
+      .then((video) => {
+        console.log(video);
+        setMediaFiles([
+          {
+            uri: video.path,
+            type: video.mime,
+            name: video.path.split('/').pop(),
+          },
+        ]);
+      })
+      .catch((error) => Toast(error.message));
   };
 
   useEffect(() => {
@@ -147,35 +147,39 @@ export function PostScreen() {
     setMediaFiles([]);
   }, [postVisible]);
 
-  // item
   const MedifafileView = ({ item }) => {
-    //const screenWidth = Dimensions.get('window').width;
-    //return (
-      //<View style={{ flex: 1 }}>
-        //{item.type === 'video/mp4' ? (
-          //<View
-         //   style={{ height: 230, backgroundColor: 'gray', width: screenWidth }}>
-         //   <VideoPlayer
-           //   controls={true}
+    const screenWidth = Dimensions.get('window').width;
+    return (
+      <View style={{ flex: 1 }}>
+        {item.type === 'video/mp4' ? (
+          <View
+            style={{
+              height: 230,
+              backgroundColor: 'gray',
+              width: screenWidth,
+            }}
+          >
+            <VideoPlayer
+              controls={true}
               // disableVolume={true}
-            //  disableFullscreen={true}
-             // disableBack={true}
-             // source={{ uri: item.uri }}
-             // style={{ width: '100%', height: '100%' }}
-             // paused={true}
-            ///>
-         // </View>
-       // ) : (
-       //   <Image
-           // style={{
-           //   height: 120,
-           //   width: 160,
-            //  borderRadius: 3,
-           //   margin: 5,
-          //  }}
-           // source={{ uri: item.uri }}
-         // />
-       // )}
+              disableFullscreen={true}
+              disableBack={true}
+              source={{ uri: item.uri }}
+              style={{ width: '100%', height: '100%' }}
+              paused={true}
+            />
+          </View>
+        ) : (
+          <Image
+            style={{
+              height: 120,
+              width: 160,
+              borderRadius: 3,
+              margin: 5,
+            }}
+            source={{ uri: item.uri }}
+          />
+        )}
 
         <View
           style={{
@@ -184,11 +188,13 @@ export function PostScreen() {
             right: 5,
             backgroundColor: Colors.white,
             borderRadius: 50,
-          }}>
+          }}
+        >
           <TouchableOpacity
             onPress={() =>
               setMediaFiles(mediaFiles.filter((i) => i.uri != item.uri))
-            }>
+            }
+          >
             <Icon
               type={Icons.AntDesign}
               name="closecircle"
@@ -196,8 +202,8 @@ export function PostScreen() {
             />
           </TouchableOpacity>
         </View>
-      //</View>
-   //);
+      </View>
+    );
   };
 
   return (
@@ -205,7 +211,8 @@ export function PostScreen() {
       onBackdropPress={() => dispatch(setPostShow(false))}
       onBackButtonPress={() => dispatch(setPostShow(false))}
       isVisible={postVisible}
-      style={{ margin: 0 }}>
+      style={{ margin: 0 }}
+    >
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.modalContent}>
           <View style={{ height: 70 }} />
@@ -215,7 +222,8 @@ export function PostScreen() {
                 paddingHorizontal: 20,
                 marginTop: 20,
                 flex: 1,
-              }}>
+              }}
+            >
               <TextInput
                 value={description}
                 onChangeText={setDescription}
@@ -243,24 +251,19 @@ export function PostScreen() {
             showsHorizontalScrollIndicator={false}
           />
         </View>
-)}
+      )}
       <View style={{ height: 65 }} />
 
       <View style={styles.topView}>
-        <View
-          style={{
-            margin: 20,
-            flexDirection: 'row',
-          }}>
+        <View style={{ margin: 20, flexDirection: 'row' }}>
           <TouchableOpacity onPress={toggleModal} style={{ marginTop: 3 }}>
             <Icon type={Icons.AntDesign} name="close" />
           </TouchableOpacity>
           <Image
             source={
-              //user.profileImagePath === ''
-                //? require 
-                ('../../assets/images/icon.png')
-                //: { uri: user.profileImagePath }
+              user.profileImagePath === ''
+                ? require('../../assets/icon.png')
+                : { uri: user.profileImagePath }
             }
             style={{
               height: 40,
@@ -274,12 +277,14 @@ export function PostScreen() {
               marginTop: 3,
               marginLeft: 'auto',
               flexDirection: 'row',
-            }}>
+            }}
+          >
             <TouchableOpacity
               style={{ marginTop: 5 }}
               onPress={() => {
                 console.log(mediaFiles);
-              }}>
+              }}
+            >
               <Icon type={Icons.Feather} name="clock" />
             </TouchableOpacity>
             <TouchableOpacity onPress={postStatus} style={{ marginLeft: 20 }}>
@@ -289,9 +294,11 @@ export function PostScreen() {
                   paddingHorizontal: 15,
                   paddingVertical: 5,
                   borderRadius: 15,
-                }}>
+                }}
+              >
                 <Text
-                  style={{ fontSize: 16, color: 'white', fontWeight: 'bold' }}>
+                  style={{ fontSize: 16, color: 'white', fontWeight: 'bold' }}
+                >
                   Post
                 </Text>
               </View>
@@ -307,7 +314,8 @@ export function PostScreen() {
           left: 0,
           right: 0,
           backgroundColor: Colors.white,
-        }}>
+        }}
+      >
         <View style={{ flexDirection: 'row', padding: 20 }}>
           <TouchableOpacity onPress={takePhotoFromCamera}>
             <Icon type={Icons.Entypo} name="camera" size={25} />
@@ -322,12 +330,17 @@ export function PostScreen() {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={choosePhotoFromLibrary}
-            style={{ marginLeft: 20 }}>
+            style={{ marginLeft: 20 }}
+          >
             <Icon type={Icons.FontAwesome} name="photo" size={25} />
           </TouchableOpacity>
           <View style={{ marginLeft: 'auto' }}>
             <TouchableOpacity style={{ flexDirection: 'row' }}>
-              <Icon type={Icons.Ionicons} name="chatbox-ellipses" size={25} />
+              <Icon
+                type={Icons.Ionicons}
+                name="chatbox-ellipses"
+                size={25}
+              />
               <Text style={{ marginLeft: 10 }}>Anyone</Text>
             </TouchableOpacity>
           </View>
@@ -336,28 +349,5 @@ export function PostScreen() {
     </Modal>
   );
 }
+export default PostScreen;
 
-const styles = StyleSheet.create({
-  modalContent: {
-    backgroundColor: '#fff',
-    flex: 1,
-  },
-  title: {
-    fontSize: 20,
-    color: 'black',
-    marginLeft: 30,
-    fontWeight: 'bold',
-  },
-  bottomText: {
-    color: 'white',
-    fontSize: 18,
-  },
-  topView: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'white',
-    elevation: 5,
-  },
-})
