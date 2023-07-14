@@ -28,7 +28,7 @@ function UploadPhoto(props) {
         quality: 0.8,
       });
   
-      if (result.cancelled) {
+      if (result.canceled) {
         // User cancelled taking photo
         return;
       }
@@ -58,7 +58,7 @@ function UploadPhoto(props) {
         quality: 0.8,
       });
   
-      if (result.cancelled) {
+      if (result.canceled) {
         // User cancelled the image selection
         return;
       }
@@ -66,7 +66,7 @@ function UploadPhoto(props) {
       const selectedImage = result.assets && result.assets.length > 0 ? result.assets[0] : null;
       if (selectedImage) {
         props.postImage(selectedImage);
-        // props.setPhoto(selectedImage.uri);
+        props.setPhoto(selectedImage.uri);
       }
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.SHORT);

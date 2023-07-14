@@ -52,7 +52,7 @@ export default function PostStoryScreen({ navigation }) {
                 maxFiles: 10,
             });
 
-            if (!result.cancelled) {
+            if (!result.canceled) {
                 const selectedMedia = {
                     uri: result.uri,
                     type: result.type,

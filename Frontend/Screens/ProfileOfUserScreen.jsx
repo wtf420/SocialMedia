@@ -6,136 +6,133 @@ import {
   ScrollView,
   Image,
   Pressable,
-  Alert,
-} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import Colors from '../constants/Colors';
-import {useDispatch, useSelector} from 'react-redux';
-import ActivitySection from '../components/ui/ActivitySection';
-import {followUser, getInfoUser, unfollowUser} from '../api/userApi';
-import {Toast} from '../components/ui/Toast';
-import {clearStatusPostsSub} from '../reducers/StatusPostReducer';
-import Header from '../components/ui/Header';
-import {RootState} from '../reducers/Store';
-import {SearchUsersByEmail} from '../api/Utils';
-import Icon, {Icons} from '../components/ui/Icons';
-import {createRequestByEmail, unfriendApi} from '../api/friendApi';
-import {clearStorySub, pushStorySub} from '../reducers/StoryReducer';
-import {getAllStory} from '../api/storyApi';
-import {unfriend} from '../reducers/UserReducer';
+  Alert
+} from "react-native"
+import React, { useEffect, useState } from "react"
+import Colors from "../constants/Colors"
+import { useDispatch, useSelector } from "react-redux"
+import ActivitySection from "../components/ui/ActivitySection"
+import { followUser, getInfoUser, unfollowUser } from "../api/userApi"
+import { Toast } from "../components/ui/Toast"
+import Header from "../components/ui/Header"
+import { SearchUsersByEmail } from "../api/Utils"
+import Icon, { Icons } from "../components/ui/Icons"
+import { createRequestByEmail, unfriendApi } from "../api/friendApi"
+import { clearStorySub, pushStorySub } from "../reducers/StoryReducer"
+import { getAllStory } from "../api/storyApi"
 
-const screenWidth = Dimensions.get('window').width;
+const screenWidth = Dimensions.get("window").width
 
 export default function ProfileOfUserScreen(props) {
-  const {navigation, route} = props;
-  const {id} = route.params;
+  const { navigation, route } = props
+  const { id } = route.params
 
-  const [user, setUser] = useState<any>({});
-  const [nameTage1, setNameTage1] = useState('');
-  const [nameTage2, setNameTage2] = useState('Follow');
-  const [followCount, setFollowCount] = useState(0);
+  const [user, setUser] = useState({})
+  const [nameTage1, setNameTage1] = useState("")
+  const [nameTage2, setNameTage2] = useState("Follow")
+  const [followCount, setFollowCount] = useState(0)
   const dispatch = useDispatch();
 
-  const uid = useSelector((state) => state.uid.id);
-  const jwt = useSelector((state) => state.token.key);
+  const uid = useSelector(state => state.uid.id);
+  const jwt = useSelector(state => state.token.key);
 
   const addFriend = async () => {
     try {
-      const response = await createRequestByEmail(user.email, uid, jwt);
+      const response = await createRequestByEmail(user.email, uid, jwt)
       if (response.status === 200) {
-        changeNameTag1('pending');
+        changeNameTag1("pending")
       } else {
-        console.log(response.status);
-        throw new Error(response.data.errorMessage);
+        console.log(response.status)
+        throw new Error(response.data.errorMessage)
       }
     } catch (error) {
-      Toast(error.message);
+      Toast(error.message)
     }
-  };
+  }
 
   const removeFriend = async () => {
     try {
-      const response = await unfriendApi(user._id, uid, jwt);
+      const response = await unfriendApi(user._id, uid, jwt)
       if (response.status === 204) {
-        changeNameTag1('false');
-        setNameTage2('Follow');
+        changeNameTag1("false")
+        setNameTage2("Follow")
       } else {
-        console.log(response.status);
-        throw new Error(response.data.errorMessage);
+        console.log(response.status)
+        throw new Error(response.data.errorMessage)
       }
     } catch (error) {
-      Toast(error.message);
-      console.log(error.message);
+      Toast(error.message)
+      console.log(error.message)
     }
-  };
+  }
 
   const handleFollow = async () => {
     try {
-      const response = await followUser(user._id, uid, jwt);
+      const response = await followUser(user._id, uid, jwt)
       if (response.status === 204) {
-        setNameTage2('Following✓');
+        setNameTage2("Following✓")
       } else {
-        console.log(response.status);
-        throw new Error(response.data.errorMessage);
+        console.log(response.status)
+        throw new Error(response.data.errorMessage)
       }
     } catch (error) {
-      Toast(error.message);
+      Toast(error.message)
     }
-  };
+  }
 
   const handleUnfollow = async () => {
     try {
-      const response = await unfollowUser(user._id, uid, jwt);
+      const response = await unfollowUser(user._id, uid, jwt)
       if (response.status === 204) {
-        setNameTage2('Follow');
+        setNameTage2("Follow")
       } else {
-        console.log(response.status);
-        throw new Error(response.data.errorMessage);
+        console.log(response.status)
+        throw new Error(response.data.errorMessage)
       }
     } catch (error) {
-      Toast(error.message);
+      Toast(error.message)
     }
-  };
+  }
 
   const handleLeftButton = () => {
-    if (nameTage1 === 'Add Friend') {
-      addFriend();
-    } else if (nameTage1 === 'Unfriend') {
-      Alert.alert('Unfriend', 'Are you sure you want to unfriend this user?', [
+    if (nameTage1 === "Add Friend") {
+      addFriend()
+    } else if (nameTage1 === "Unfriend") {
+      Alert.alert("Unfriend", "Are you sure you want to unfriend this user?", [
         {
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
         },
         {
-          text: 'OK',
+          text: "OK",
           onPress: () => {
-            removeFriend();
-          },
-        },
-      ]);
+            removeFriend()
+          }
+        }
+      ])
     }
-  };
+  }
 
   const handleRightButton = () => {
-    if (nameTage2 === 'Follow') {
-      handleFollow();
-      setFollowCount(followCount + 1);
+    if (nameTage2 === "Follow") {
+      handleFollow()
+      setFollowCount(followCount + 1)
     } else {
-      handleUnfollow();
-      setFollowCount(followCount - 1);
+      handleUnfollow()
+      setFollowCount(followCount - 1)
     }
-  };
+  }
 
-  const changeNameTag1 = (isFriend) => {
+  const changeNameTag1 = isFriend => {
     setNameTage1(
-      isFriend === 'pending'
-        ? 'Pending'
-        : isFriend === 'true'
-        ? 'Unfriend'
-        : 'Add Friend',
-    );
-  };
+      isFriend === "pending"
+        ? "Pending"
+        : isFriend === "true"
+        ? "Unfriend"
+        : "Add Friend"
+    )
+  }
 
   useEffect(() => {
     const getUserInfo = async () => {
@@ -147,7 +144,7 @@ export default function ProfileOfUserScreen(props) {
           setFollowCount(data.followers.length);
           data.followers.forEach((item) => {
             if (item === uid) {
-              setNameTage2('Following✓');
+              setNameTage2("Following✓");
             }
           });
         } else {
@@ -158,7 +155,7 @@ export default function ProfileOfUserScreen(props) {
         Toast(error.message);
       }
     };
-
+  
     const getStory = async () => {
       const response = await getAllStory(id, jwt);
       if (response.status === 200) {
@@ -170,46 +167,47 @@ export default function ProfileOfUserScreen(props) {
         console.log(response.status);
       }
     };
+  
     dispatch(clearStorySub());
     getUserInfo();
     getStory();
-    // dispatch(clearStatusPostsSub());
   }, []);
+  
 
   useEffect(() => {
     const checkFriend = async () => {
       try {
-        if (!user.email) return;
-        const response = await SearchUsersByEmail(user.email, uid, jwt);
+        if (!user.email) return
+        const response = await SearchUsersByEmail(user.email, uid, jwt)
         if (response.status === 200) {
-          const data = response.data;
-          data.forEach((item) => {
+          const data = response.data
+          data.forEach(item => {
             if (item.email === user.email) {
-              changeNameTag1(item.isFriend);
+              changeNameTag1(item.isFriend)
             }
-          });
+          })
         } else {
-          console.log(response.status);
-          throw new Error(response.data.errorMessage);
+          console.log(response.status)
+          throw new Error(response.data.errorMessage)
         }
       } catch (error) {
-        Toast(error.message);
+        Toast(error.message)
       }
-    };
-    checkFriend();
-  }, [user.email]);
+    }
+    checkFriend()
+  }, [user.email])
 
   // return null;
   return (
-    <ScrollView contentContainerStyle={{flexGrow: 1}}>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <Header navigation={navigation} />
       <View style={styles.container}>
         <View style={styles.backgroundAvatarContainer}>
           <Image
             source={
               user.backgroundImagePath
-                ? {uri: user.backgroundImagePath}
-                : require('../assets/images/DefaultBackgroundAvatar.jpg')
+                ? { uri: user.backgroundImagePath }
+                : require("../assets/images/DefaultBackgroundAvatar.jpg")
             }
             style={styles.backgroundAvatarImage}
           />
@@ -218,14 +216,15 @@ export default function ProfileOfUserScreen(props) {
           style={{
             height: 100,
             width: screenWidth,
-            flexDirection: 'row-reverse',
-          }}>
+            flexDirection: "row-reverse"
+          }}
+        >
           <View style={styles.avatarContainer}>
             <Image
               source={
                 user.profileImagePath
-                  ? {uri: user.profileImagePath}
-                  : require('../assets/images/Spiderman.jpg')
+                  ? { uri: user.profileImagePath }
+                  : require("../assets/images/Spiderman.jpg")
               }
               style={styles.avatarImage}
             />
@@ -235,7 +234,8 @@ export default function ProfileOfUserScreen(props) {
           <Text style={styles.textName}>{user.name}</Text>
           {user.headline && (
             <Text
-              style={[styles.textName, {fontSize: 18, fontWeight: 'normal'}]}>
+              style={[styles.textName, { fontSize: 18, fontWeight: "normal" }]}
+            >
               {user.headline}
             </Text>
           )}
@@ -243,8 +243,9 @@ export default function ProfileOfUserScreen(props) {
             <Text
               style={[
                 styles.textName,
-                {fontSize: 18, fontWeight: 'normal', marginTop: 10},
-              ]}>
+                { fontSize: 18, fontWeight: "normal", marginTop: 10 }
+              ]}
+            >
               {user.workingPlace}
             </Text>
           )}
@@ -253,8 +254,9 @@ export default function ProfileOfUserScreen(props) {
             <Text
               style={[
                 styles.textName,
-                {fontSize: 18, fontWeight: 'normal', color: '#000000a2'},
-              ]}>
+                { fontSize: 18, fontWeight: "normal", color: "#000000a2" }
+              ]}
+            >
               {user.location}
             </Text>
           )}
@@ -263,40 +265,49 @@ export default function ProfileOfUserScreen(props) {
               styles.textName,
               {
                 fontSize: 18,
-                fontWeight: 'normal',
-                color: '#000000a2',
-                marginTop: 10,
-              },
-            ]}>
+                fontWeight: "normal",
+                color: "#000000a2",
+                marginTop: 10
+              }
+            ]}
+          >
             {`${user.connections?.length} connections`}
           </Text>
           <View
-            style={{flexDirection: 'row', marginTop: 20, marginHorizontal: 15}}>
+            style={{
+              flexDirection: "row",
+              marginTop: 20,
+              marginHorizontal: 15
+            }}
+          >
             <View
               style={{
                 height: 35,
                 width: 150,
                 borderRadius: 30,
-                overflow: 'hidden',
+                overflow: "hidden",
                 backgroundColor:
-                  nameTage1 === 'Add Friend'
-                    ? '#0A66C2'
-                    : nameTage1 === 'Unfriend'
+                  nameTage1 === "Add Friend"
+                    ? "#0A66C2"
+                    : nameTage1 === "Unfriend"
                     ? Colors.red
-                    : 'gray',
-                alignItems: 'center',
-              }}>
+                    : "gray",
+                alignItems: "center"
+              }}
+            >
               <Pressable
                 onPress={handleLeftButton}
-                android_ripple={{color: '#00043d'}}
+                android_ripple={{ color: "#00043d" }}
                 style={{
-                  backgroundColor: 'transparent',
+                  backgroundColor: "transparent",
                   width: 150,
                   height: 35,
-                  justifyContent: 'center',
-                }}>
+                  justifyContent: "center"
+                }}
+              >
                 <Text
-                  style={{textAlign: 'center', fontSize: 18, color: 'white'}}>
+                  style={{ textAlign: "center", fontSize: 18, color: "white" }}
+                >
                   {nameTage1}
                 </Text>
               </Pressable>
@@ -307,22 +318,29 @@ export default function ProfileOfUserScreen(props) {
                 width: 150,
                 borderRadius: 30,
                 borderWidth: 1,
-                borderColor: '#0A66C2',
-                overflow: 'hidden',
-                backgroundColor: 'white',
-                marginHorizontal: 10,
-              }}>
+                borderColor: "#0A66C2",
+                overflow: "hidden",
+                backgroundColor: "white",
+                marginHorizontal: 10
+              }}
+            >
               <Pressable
                 onPress={handleRightButton}
-                android_ripple={{color: '#0d8fe0ff'}}
+                android_ripple={{ color: "#0d8fe0ff" }}
                 style={{
-                  backgroundColor: 'transparent',
+                  backgroundColor: "transparent",
                   width: 150,
                   height: 35,
-                  justifyContent: 'center',
-                }}>
+                  justifyContent: "center"
+                }}
+              >
                 <Text
-                  style={{textAlign: 'center', fontSize: 18, color: '#0A66C2'}}>
+                  style={{
+                    textAlign: "center",
+                    fontSize: 18,
+                    color: "#0A66C2"
+                  }}
+                >
                   {nameTage2}
                 </Text>
               </Pressable>
@@ -333,25 +351,27 @@ export default function ProfileOfUserScreen(props) {
                 width: 35,
                 borderRadius: 17.5,
                 borderWidth: 1,
-                borderColor: '#727272',
-                overflow: 'hidden',
-                backgroundColor: 'white',
-                marginHorizontal: 10,
-              }}>
+                borderColor: "#727272",
+                overflow: "hidden",
+                backgroundColor: "white",
+                marginHorizontal: 10
+              }}
+            >
               <Pressable
                 onPress={() => {
-                  if (nameTage1 === 'Unfriend')
-                    navigation.navigate('chat', {id: id});
-                  else Toast('You are not friend with this user');
+                  if (nameTage1 === "Unfriend")
+                    navigation.navigate("chat", { id: id })
+                  else Toast("You are not friend with this user")
                 }}
-                android_ripple={{color: '#0d8fe0ff'}}
+                android_ripple={{ color: "#0d8fe0ff" }}
                 style={{
-                  backgroundColor: 'transparent',
+                  backgroundColor: "transparent",
                   width: 35,
                   height: 35,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
                 <Icon
                   type={Icons.AntDesign}
                   name="message1"
@@ -362,7 +382,7 @@ export default function ProfileOfUserScreen(props) {
             </View>
           </View>
           <View
-            style={{backgroundColor: '#E9E5DF', height: 10, marginTop: 10}}
+            style={{ backgroundColor: "#E9E5DF", height: 10, marginTop: 10 }}
           />
           <View>
             <ActivitySection
@@ -374,75 +394,75 @@ export default function ProfileOfUserScreen(props) {
         </View>
       </View>
     </ScrollView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
   },
   backgroundAvatarContainer: {
     height: 120,
-    width: screenWidth,
+    width: screenWidth
   },
   backgroundAvatarImage: {
     height: 120,
     width: screenWidth,
-    opacity: 0.75,
+    opacity: 0.75
   },
   avatarContainer: {
     height: 140,
     width: 140,
-    position: 'absolute',
-    backgroundColor: '#ccc',
+    position: "absolute",
+    backgroundColor: "#ccc",
     bottom: 0,
     left: screenWidth - 155,
     borderRadius: 70,
-    justifyContent: 'center',
-    alignContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignContent: "center",
+    alignItems: "center",
     borderWidth: 5,
-    borderColor: 'white',
+    borderColor: "white"
   },
   avatarImage: {
     height: 130,
     width: 130,
-    borderRadius: 65,
+    borderRadius: 65
   },
   buttonAddImage: {
-    backgroundColor: 'transparent',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "transparent",
+    justifyContent: "center",
+    alignItems: "center"
   },
   buttonAddImageOuter: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 5,
     left: 100,
-    backgroundColor: '#0A66C2',
+    backgroundColor: "#0A66C2",
     borderRadius: 20,
-    borderColor: 'white',
+    borderColor: "white",
     borderWidth: 5,
     width: 40,
     height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center"
   },
   textName: {
-    fontFamily: 'Roboto',
+    fontFamily: "Roboto",
     fontSize: 30,
-    fontWeight: 'bold',
-    color: 'black',
-    marginLeft: 25,
+    fontWeight: "bold",
+    color: "black",
+    marginLeft: 25
   },
   btnLogout: {
     backgroundColor: Colors.skyBlue,
     padding: 18,
-    elevation: 3,
+    elevation: 3
   },
   fontText: {
-    fontFamily: 'Roboto',
-    fontStyle: 'normal',
+    fontFamily: "Roboto",
+    fontStyle: "normal",
     fontSize: 20,
-    lineHeight: 19,
-  },
-});
+    lineHeight: 19
+  }
+})
