@@ -15,7 +15,8 @@ import { useDispatch, useSelector } from "react-redux"
 import chatApi from "../../api/chatApi"
 import Icon, { Icons } from "../../components/ui/Icons"
 import Colors from "../../constants/Colors"
-import ImagePicker from "react-native-image-crop-picker"
+import * as ImagePicker from 'expo-image-picker';
+import { ToastAndroid } from 'react-native';
 import { Toast } from "../../components/ui/Toast"
 import { emitEvent, subscribeToEvent } from "../../utils/socket"
 import { setCallShow, setDataCall } from "../../reducers/UtilsReducer"
@@ -82,20 +83,32 @@ const ChatRoom = ({ navigation, route }) => {
       .catch(error => Toast(error.message))
   }
 
-  const choosePhotoFromLibrary = () => {
-    ImagePicker.openPicker({
-      waitAnimationEnd: false,
-      compressImageQuality: 0.8
-    })
-      .then(image => {
+  const choosePhotoFromLibrary = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        ToastAndroid.show('Permission to access media library denied', ToastAndroid.SHORT);
+        return;
+      }
+  
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.8,
+      });
+  
+      if (!result.cancelled) {
         setMediaFile({
-          uri: image.path,
-          type: image.mime,
-          name: image.path.split("/").pop() || image.path
-        })
-      })
-      .catch(error => Toast(error.message))
-  }
+          uri: result.uri,
+          type: 'image/jpeg', // or result.type
+          name: 'photo.jpg', // or result.name
+        });
+      }
+    } catch (error) {
+      ToastAndroid.show(error.message, ToastAndroid.SHORT);
+    }
+  };
 
   useEffect(() => {
     const getAllMessages = async () => {

@@ -17,7 +17,8 @@ import Colors from "../constants/Colors";
   import {useDispatch, useSelector} from 'react-redux';
 import { RootState } from "../reducers/Store";
 import { Toast } from "../components/ui/Toast";
-import ImagePicker from "react-native-image-crop-picker";
+import * as ImagePicker from 'expo-image-picker';
+import { ToastAndroid } from 'react-native';
   import {
     createComment,
     deleteComment,
@@ -139,20 +140,32 @@ export default function DetailStatusScreen(navigation, route) {
             .catch((error) => Toast(error.message));
     };
 
-    const choosePhotoFromLibrary = () => {
-        ImagePicker.openPicker({
-            waitAnimationEnd: false,
-            compressImageQuality: 0.8,
-        })
-            .then((image) => {
-                setMediaFile({
-                    uri: image.path,
-                    type: image.mime,
-                    name: image.path.split("/").pop() || image.path,
-                });
-            })
-            .catch((error) => Toast(error.message));
-    };
+    const choosePhotoFromLibrary = async () => {
+        try {
+          const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+          if (status !== 'granted') {
+            ToastAndroid.show('Permission to access media library denied', ToastAndroid.SHORT);
+            return;
+          }
+      
+          const result = await ImagePicker.launchImageLibraryAsync({
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.8,
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          });
+      
+          if (!result.cancelled) {
+            setMediaFile({
+              uri: result.uri,
+              type: 'image/jpeg', // or result.type
+              name: 'photo.jpg', // or result.name
+            });
+          }
+        } catch (error) {
+          ToastAndroid.show(error.message, ToastAndroid.SHORT);
+        }
+      };
 
     const getComments = async () => {
         try {
