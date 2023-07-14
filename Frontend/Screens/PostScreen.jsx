@@ -80,9 +80,9 @@ function PostScreen() {
       return;
     }
     ImagePicker.openCamera({
-      // height: 140,
-      // width: 140,
-      // cropperCircleOverlay: true,
+      height: 140,
+      width: 140,
+      cropperCircleOverlay: true,
     })
       .then((image) => {
         console.log(image);
@@ -184,7 +184,7 @@ function PostScreen() {
           >
             <VideoPlayer
               controls={true}
-              // disableVolume={true}
+              disableVolume={true}
               disableFullscreen={true}
               disableBack={true}
               source={{ uri: item.uri }}
@@ -237,7 +237,7 @@ function PostScreen() {
       style={{ margin: 0 }}
     >
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={styles.modalContent}>
+        <View /*style={styles.modalContent}*/>
           <View style={{ height: 70 }} />
           <View style={{ backgroundColor: 'white', flex: 1 }}>
             <View
@@ -277,7 +277,7 @@ function PostScreen() {
       )}
       <View style={{ height: 65 }} />
 
-      <View style={styles.topView}>
+      <View /*style={styles.topview}*/>
         <View style={{ margin: 20, flexDirection: 'row' }}>
           <TouchableOpacity onPress={toggleModal} style={{ marginTop: 3 }}>
             <Icon type={Icons.AntDesign} name="close" />

@@ -23,10 +23,6 @@
         },
         "web": {
             "favicon": "./assets/favicon.png"
-        },
-        "plugins": [
-            "@babel/plugin-proposal-private-property-in-object",
-            { "loose": true }
-        ]
+        }
     }
 }

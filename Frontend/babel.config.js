@@ -10,7 +10,9 @@ module.exports = function (api) {
             "react-native-paper/babel",
             "@babel/plugin-transform-export-namespace-from",
             "react-native-reanimated/plugin",
-            "@babel/plugin-transform-private-property-in-object",
-        ],
+            ["@babel/plugin-transform-class-properties", { "loose": true }],
+            ["@babel/plugin-transform-private-methods", { "loose": true }],
+            ["@babel/plugin-proposal-private-property-in-object", { "loose": true }]
+        ] ,
     };
 };
