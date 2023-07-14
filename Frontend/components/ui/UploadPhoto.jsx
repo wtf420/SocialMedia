@@ -1,32 +1,48 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from "react"
-import { Pressable, StyleSheet, Text, View } from "react-native"
-import Modal from "react-native-modal"
+import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import Modal from "react-native-modal";
 import * as ImagePicker from 'expo-image-picker';
 import { ToastAndroid } from 'react-native';
-import Colors from "../../constants/Colors"
-import { Toast } from "./Toast"
+import Colors from "../../constants/Colors";
+import { Toast } from "./Toast";
 
 function UploadPhoto(props) {
   const toggleModal = () => {
-    props.setVisible(!props.isVisible)
-  }
+    props.setVisible(!props.isVisible);
+  };
 
-  const takePhotoFromCamera = () => {
-    toggleModal()
-    ImagePicker.openCamera({
-      height: props.height,
-      width: props.width,
-      cropping: true,
-      cropperCircleOverlay: props.isCirle
-    })
-      .then(image => {
-        props.postImage(image)
-        // console.log(image);
-        // props.setPhoto(image.path);
-      })
-      .catch(error => Toast(error.message))
-  }
+  const takePhotoFromCamera = async () => {
+    toggleModal();
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        ToastAndroid.show('Permission to access camera denied', ToastAndroid.SHORT);
+        return;
+      }
+  
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [props.width, props.height],
+        quality: 0.8,
+      });
+  
+      if (result.cancelled) {
+        // User cancelled taking photo
+        return;
+      }
+  
+      const selectedImage = result.assets && result.assets.length > 0 ? result.assets[0] : null;
+      if (selectedImage) {
+        props.postImage(selectedImage);
+        // props.setPhoto(selectedImage.uri);
+      }
+    } catch (error) {
+      ToastAndroid.show(error.message, ToastAndroid.SHORT);
+    }
+  };
+
   const choosePhotoFromLibrary = async () => {
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -42,16 +58,20 @@ function UploadPhoto(props) {
         quality: 0.8,
       });
   
-      if (!result.cancelled) {
-        props.postImage(result);
-        // console.log(result);
-        // props.setPhoto(result.uri);
+      if (result.cancelled) {
+        // User cancelled the image selection
+        return;
+      }
+  
+      const selectedImage = result.assets && result.assets.length > 0 ? result.assets[0] : null;
+      if (selectedImage) {
+        props.postImage(selectedImage);
+        // props.setPhoto(selectedImage.uri);
       }
     } catch (error) {
       ToastAndroid.show(error.message, ToastAndroid.SHORT);
     }
   };
-  
 
   return (
     <Modal
@@ -102,10 +122,10 @@ function UploadPhoto(props) {
         </View>
       </View>
     </Modal>
-  )
+  );
 }
 
-export default UploadPhoto
+export default UploadPhoto;
 
 const styles = StyleSheet.create({
   modal: {
@@ -159,4 +179,4 @@ const styles = StyleSheet.create({
   panelButtonTitle: {
     fontSize: 17
   }
-})
+});

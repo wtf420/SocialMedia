@@ -26,7 +26,7 @@ export default function SearchScreen({navigation}) {
   const [listData, setListData] = useState([]);
   const isFocused = useIsFocused();
 
-  const searchRef = useRef<TextInput>(null);
+  const searchRef = useRef(null);
 
   const clearText = () => {
     setText('');
@@ -107,12 +107,12 @@ export default function SearchScreen({navigation}) {
             <Icon type={Icons.AntDesign} name="arrowleft" />
           </TouchableOpacity>
           <TextInput
-            ref={searchRef}
-            style={styles.input}
-            placeholder="Search"
-            onChangeText={textinput => setText(textinput)}
-            value={text}
-          />
+  ref={searchRef}
+  style={styles.input}
+  placeholder="Search"
+  onChangeText={textinput => setText(textinput)}
+  value={text}
+/>
           {text.length > 0 && (
             <TouchableOpacity onPress={clearText} style={styles.clearButton}>
               <Icon type={Icons.AntDesign} name="closecircle" />
