@@ -9,7 +9,7 @@ import { Toast } from "./Toast";
 import { useIsFocused } from "@react-navigation/native";
 
 const FriendList = ({ navigation }) => {
-    const [friends, setFriends] = useState;
+    const [friends, setFriends] = useState([]);
     const token = useSelector((state) => state.token.key);
     const uid = useSelector((stata) => stata.uid.id);
 
