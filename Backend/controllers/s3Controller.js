@@ -1,38 +1,27 @@
-const { S3Client, DeleteObjectCommand } = require('@aws-sdk/client-s3');
-const multer = require('multer');
-const { v4: uuid } = require('uuid');
-const multerS3 = require('multer-s3');
+const { v4: uuid } = require('uuid')
+const fs = require('fs')
+const firebase = require('firebase/compat/app')
+require('firebase/compat/storage')
+const multer = require('multer')
 
-const s3Client = new S3Client({
-    region: 'ap-southeast-1',
-    credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    },
-});
+// Khởi tạo Firebase App
+firebase.initializeApp({
+    apiKey: 'AIzaSyBVmhEivXz9psZowEKSuQ_MCsuH1PrZaTE',
+    authDomain: 'social-media-620ea.firebaseapp.com',
+    projectId: 'social-media-620ea',
+    storageBucket: 'social-media-620ea.appspot.com',
+})
+
+const storage = firebase.default.storage()
 
 exports.uploadMediaFiles = multer({
-    storage: multerS3({
-        s3: s3Client,
-        bucket: 'workwise',
-        acl: 'public-read',
-        contentType: function (req, file, cb) {
-            cb(null, file.mimetype);
-        },
-        contentDisposition: function (req, file, cb) {
-            cb(null, file.originalname);
-        },
-        key: function (req, file, cb) {
-            cb(null, uuid());
-        },
-    }),
-});
+    storage: multer.memoryStorage(),
+}).single('file')
 
-exports.deleteMediaFile = (path) => {
-    const command = new DeleteObjectCommand({
-        Bucket: 'workwise',
-        Key: path.substring(path.lastIndexOf('/') + 1, path.length),
-    });
-
-    s3Client.send(command).catch(() => {});
-};
+exports.deleteMediaFile = async (path) => {
+    try {
+        await storage.ref(path).delete()
+    } catch (error) {
+        console.error('Error deleting file:', error)
+    }
+}

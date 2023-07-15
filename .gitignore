@@ -10,6 +10,8 @@ Frontend/*.mobileprovision
 Frontend/*.orig.*
 Frontend/web-build/
 
+Frontend/api/ApiManager.jsx
+Frontend/utils/socket.js
 # macOS
 Frontend/.DS_Store
 

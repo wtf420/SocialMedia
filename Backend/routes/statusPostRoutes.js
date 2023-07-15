@@ -11,7 +11,7 @@ router
     .post(
         authController.isUser,
         authController.isOwnerOfThePath,
-        s3Controller.uploadMediaFiles.array('media-files'),
+        s3Controller.uploadMediaFiles,
         statusPostController.createNewStatusPost
     )
 

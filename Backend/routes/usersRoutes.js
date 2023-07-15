@@ -19,7 +19,7 @@ router
     .post(
         authController.isUser,
         authController.isOwnerOfThePath,
-        s3Controller.uploadMediaFiles.single('profile-image'),
+        s3Controller.uploadMediaFiles,
         usersController.updateProfileImage
     )
 
@@ -28,7 +28,7 @@ router
     .post(
         authController.isUser,
         authController.isOwnerOfThePath,
-        s3Controller.uploadMediaFiles.single('background-image'),
+        s3Controller.uploadMediaFiles,
         usersController.updateUserBackground
     )
 
