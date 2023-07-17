@@ -94,13 +94,14 @@ function ProfileScreen({ navigation }) {
             });
     };
 
-    const postBackgroundImage = (image) => {
-        const dataForm = new FormData();
-        dataForm.append("background-image", {
-            uri: image.path,
-            type: image.mime,
-            name: image.filename || "profile-image",
+    const postBackgroundImage = async (image) => {
+        let dataForm = new FormData();
+        dataForm.append("image", {
+            name: new Date() + "_bg-Image",
+            uri: image.uri,
+            type: "image/jpg",
         });
+
         dispatch(setStatus(true));
         postBackgrImg(dataForm, uid, token)
             .then((response) => {

@@ -78,7 +78,6 @@ function UploadPhoto(props) {
                 result.assets && result.assets.length > 0
                     ? result.assets[0]
                     : null;
-            console.log(selectedImage);
             if (selectedImage) {
                 props.postImage(selectedImage);
                 //   props.setPhoto(selectedImage.uri);

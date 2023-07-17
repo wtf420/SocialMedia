@@ -14,16 +14,16 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import Icon, { Icons } from "../components/ui/Icons";
 import Colors from "../constants/Colors";
-  import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../reducers/Store";
 import { Toast } from "../components/ui/Toast";
-import * as ImagePicker from 'expo-image-picker';
-import { ToastAndroid } from 'react-native';
-  import {
+import * as ImagePicker from "expo-image-picker";
+import { ToastAndroid } from "react-native";
+import {
     createComment,
     deleteComment,
     getAllComments,
-  } from '../api/statusCommentApi';
+} from "../api/statusCommentApi";
 import ItemComment from "../components/ui/ItemComment";
 import ShowPosts from "../components/ui/ShowPosts";
 import {
@@ -142,30 +142,34 @@ export default function DetailStatusScreen(navigation, route) {
 
     const choosePhotoFromLibrary = async () => {
         try {
-          const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-          if (status !== 'granted') {
-            ToastAndroid.show('Permission to access media library denied', ToastAndroid.SHORT);
-            return;
-          }
-      
-          const result = await ImagePicker.launchImageLibraryAsync({
-            allowsEditing: true,
-            aspect: [1, 1],
-            quality: 0.8,
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          });
-      
-          if (!result.cancelled) {
-            setMediaFile({
-              uri: result.uri,
-              type: 'image/jpeg', // or result.type
-              name: 'photo.jpg', // or result.name
+            const { status } =
+                await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== "granted") {
+                ToastAndroid.show(
+                    "Permission to access media library denied",
+                    ToastAndroid.SHORT
+                );
+                return;
+            }
+
+            const result = await ImagePicker.launchImageLibraryAsync({
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.8,
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
             });
-          }
+
+            if (!result.canceled) {
+                setMediaFile({
+                    uri: result.uri,
+                    type: "image/jpeg", // or result.type
+                    name: "photo.jpg", // or result.name
+                });
+            }
         } catch (error) {
-          ToastAndroid.show(error.message, ToastAndroid.SHORT);
+            ToastAndroid.show(error.message, ToastAndroid.SHORT);
         }
-      };
+    };
 
     const getComments = async () => {
         try {

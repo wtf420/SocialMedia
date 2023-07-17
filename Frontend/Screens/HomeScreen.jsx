@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../reducers/Store";
+import ShowPosts from "../components/ui/ShowPosts";
 import { Toast } from "../components/ui/Toast";
 import LottieView from "lottie-react-native";
 import {
