@@ -39,10 +39,41 @@ app.use('', authRouter)
 app.post('/email-search', stringSearchController.searchByEmail)
 app.post('/name-search', stringSearchController.searchByName)
 app.use('/chatroom', chatRouter)
-app.post('/upload-image', s3Controller.uploadMediaFiles, (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ error: 'No file uploaded' })
-    }
+app.post('/upload-image', (req, res) => {
+    uploadMediaFiles(req, res, (err) => {
+        if (err) {
+            console.error('Error uploading file:', err)
+            res.status(500).json('Unable to upload image')
+        } else {
+            const file = req.file
+            if (file) {
+                const filePath = uuid()
+                const uploadOptions = {
+                    destination: filePath,
+                    resumable: false,
+                    metadata: {
+                        contentType: file.mimetype,
+                        contentDisposition: file.originalname,
+                    },
+                }
+
+                bucket.upload(file.buffer, uploadOptions, (uploadErr) => {
+                    if (uploadErr) {
+                        console.error(
+                            'Error uploading file to Firebase Storage:',
+                            uploadErr
+                        )
+                        res.status(500).json('Unable to upload image')
+                    } else {
+                        const fileUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`
+                        res.status(200).json(fileUrl)
+                    }
+                })
+            } else {
+                res.status(500).json('Unable to upload image')
+            }
+        }
+    })
 })
 app.use('/s/:statusPostId/comment', statusCommentRouter)
 app.get('/s/:statusPostId', statusPostController.getStatusPostById)
