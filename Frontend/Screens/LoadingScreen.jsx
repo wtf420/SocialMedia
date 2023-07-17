@@ -111,7 +111,7 @@ export default function LoadingScreen({ navigation, route }) {
 
   return (
     <View style={{ flex: 1 }}>
-      <Text style={styles.textLoading}>Cloud Media</Text>
+      <Text style={styles.textLoading}>Social Media</Text>
       <View style={[StyleSheet.absoluteFillObject, { alignItems: "center" }]}>
         <LottieView
           source={require("../assets/images/data-loader.json")}
