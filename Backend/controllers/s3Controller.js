@@ -2,7 +2,10 @@ var admin = require('firebase-admin')
 const asyncCatch = require('../utils/asyncCatch')
 const { v4: uuidv4 } = require('uuid')
 const User = require('../models/User')
+const StatusPost = require('../models/StatusPost')
 const s3Controller = require('./s3Controller')
+const socketIO = require('../socket/socket')
+const Notification = require('../models/Notification')
 
 var serviceAccount = require('../social-media-620ea-firebase-adminsdk-76t2t-2acb9784e9.json')
 admin.initializeApp({
@@ -12,56 +15,100 @@ admin.initializeApp({
 
 const bucket = admin.storage().bucket()
 
-exports.uploadMediaFiles = asyncCatch(async (req, res, next) => {
-    // if (!req.file) {
-    //     return res.status(400).json({ error: 'No image file provided' })
-    // }
+exports.uploadMediaFiles = asyncCatch(async (req, res, next) => {})
 
-    // const imageFile = req.file
+exports.uploadPostFiles = asyncCatch(async (req, res, next) => {
+    const { userId } = req.params
+    const mediaFiles = []
 
-    // if (!imageFile.mimetype.startsWith('image/')) {
-    //     return res.status(400).json({
-    //         error: 'Invalid file format. Only image files are allowed.',
-    //     })
-    // }
+    if (req.files) {
+        const promises = req.files.map(async (file) => {
+            const filename = file.originalname
+            const blob = bucket.file(filename)
+            const downloadTokens = uuidv4()
 
-    // const filename = imageFile.originalname
+            const blobStream = blob.createWriteStream({
+                metadata: {
+                    contentType: file.mimetype,
+                    metadata: {
+                        firebaseStorageDownloadTokens: downloadTokens,
+                    },
+                },
+            })
 
-    // const blob = bucket.file(filename)
+            return new Promise((resolve, reject) => {
+                blobStream.on('error', (err) => {
+                    console.error('Error uploading image to Firebase:', err)
+                    reject(err)
+                })
 
-    // const blobStream = blob.createWriteStream({
-    //     metadata: {
-    //         contentType: imageFile.mimetype,
-    //         metadata: {
-    //             firebaseStorageDownloadTokens: uuidv4(),
-    //         },
-    //     },
-    // })
+                blobStream.on('finish', async () => {
+                    // Make the image file publicly accessible
+                    await blob.makePublic()
 
-    // blobStream.on('error', (err) => {
-    //     console.error('Error uploading image to Firebase:', err)
-    //     return res.status(500).json({ error: 'Failed to upload image' })
-    // })
+                    const downloadUrl = await blob.getSignedUrl({
+                        action: 'read',
+                        expires: '03-01-2500', // Set an appropriate expiration date
+                    })
 
-    // blobStream.on('finish', async () => {
-    //     // Make the image file publicly accessible
-    //     await blob.makePublic()
+                    let fileType
+                    if (file.mimetype.startsWith('image/')) fileType = 'Image'
+                    else if (file.mimetype.startsWith('video/'))
+                        fileType = 'Video'
 
-    //     // Get the uploaded image URL
-    //     const imageUrl = `https://storage.googleapis.com/${bucket.name}/${filename}`
+                    const newFile = {
+                        location: downloadUrl[0],
+                        name: file.originalname,
+                        fileType: fileType,
+                    }
 
-    //     const downloadUrl = await blob.getSignedUrl({
-    //         action: 'read',
-    //         expires: '03-01-2500', // Set an appropriate expiration date
-    //     })
+                    resolve(newFile)
+                })
 
-    //     // Set the uploaded image URL and download URL on the request object for further processing
-    //     req.uploadedFileUrl = imageUrl
-    //     req.uploadedFileDownloadUrl = downloadUrl[0]
-    // })
+                blobStream.end(file.buffer)
+            })
+        })
 
-    // blobStream.end(imageFile.buffer)
-    next()
+        try {
+            const uploadedFiles = await Promise.all(promises)
+            mediaFiles.push(...uploadedFiles)
+        } catch (err) {
+            return res.status(500).json({ error: 'Failed to upload image' })
+        }
+    }
+
+    const newStatusPost = await StatusPost.create({
+        author: userId,
+        description: req.body.description,
+        mediaFiles: mediaFiles,
+        sharedLink: req.body.sharedLink,
+    })
+
+    if (!newStatusPost) {
+        // if (req.files)
+        //     req.files.forEach((item) =>
+        //         s3Controller.deleteMediaFile(item.location)
+        //     )
+        // return next(new AppError('Unable to create new status post', 500))
+        console.log('ded')
+    }
+
+    // why populated is not the response for res.json is because it was in the old version and i hate to change it
+    // and notify the change to the frontend lmao
+    const populatedPost = await newStatusPost.populate(
+        'author',
+        '_id name profileImagePath'
+    )
+
+    const io = socketIO.getIO()
+    User.findById(userId).then((user) => {
+        sendNotificationOnPosting(populatedPost._id, user)
+        user.followers.forEach((follower) => {
+            io.in(follower._id.toString()).emit('newStatusPost', populatedPost)
+        })
+    })
+
+    res.status(200).json(newStatusPost)
 })
 
 exports.uploadBackgroundImage = asyncCatch(async (req, res, next) => {
@@ -211,4 +258,17 @@ exports.deleteMediaFile = async (signedUrl) => {
     } catch (error) {
         console.error('Error deleting file:', error)
     }
+}
+
+const sendNotificationOnPosting = async (statusPostId, statusPostAuthor) => {
+    statusPostAuthor.followers.forEach(async (followerId) => {
+        Notification.create({
+            userId: followerId.toString(),
+            sender: statusPostAuthor._id,
+            notificationType: 'Comment', // todo: there is no time for other type, should be changed in future
+            content: `${statusPostAuthor.name} has posted a new post`,
+            isRead: false,
+            link: statusPostId,
+        })
+    })
 }

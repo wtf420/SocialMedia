@@ -30,19 +30,6 @@ const getUserIdFromJWT = async (req, next) => {
     return data.id
 }
 
-const sendNotificationOnPosting = async (statusPostId, statusPostAuthor) => {
-    statusPostAuthor.followers.forEach(async (followerId) => {
-        Notification.create({
-            userId: followerId.toString(),
-            sender: statusPostAuthor._id,
-            notificationType: 'Comment', // todo: there is no time for other type, should be changed in future
-            content: `${statusPostAuthor.name} has posted a new post`,
-            isRead: false,
-            link: statusPostId,
-        })
-    })
-}
-
 exports.getStatusPostById = asyncCatch(async (req, res, next) => {
     const { statusPostId } = req.params
     const statusPost = await StatusPost.findById(statusPostId).populate(
@@ -66,61 +53,6 @@ exports.getStatusPostById = asyncCatch(async (req, res, next) => {
     delete postObject.likedUsers
 
     res.status(200).json(postObject)
-})
-
-exports.createNewStatusPost = asyncCatch(async (req, res, next) => {
-    const { userId } = req.params
-
-    console.log(req.body.description)
-
-    const mediaFiles = []
-    if (req.files) {
-        req.files.forEach((file) => {
-            let fileType
-            if (file.mimetype.startsWith('image/')) fileType = 'Image'
-            else if (file.mimetype.startsWith('video/')) fileType = 'Video'
-
-            const newFile = {
-                location: file.location,
-                name: file.originalname,
-                fileType: fileType,
-            }
-
-            mediaFiles.push(newFile)
-        })
-    }
-
-    const newStatusPost = await StatusPost.create({
-        author: userId,
-        description: req.body.description,
-        mediaFiles: mediaFiles,
-        sharedLink: req.body.sharedLink,
-    })
-
-    if (!newStatusPost) {
-        if (req.files)
-            req.files.forEach((item) =>
-                s3Controller.deleteMediaFile(item.location)
-            )
-        return next(new AppError('Unable to create new status post', 500))
-    }
-
-    // why populated is not the response for res.json is because it was in the old version and i hate to change it
-    // and notify the change to the frontend lmao
-    const populatedPost = await newStatusPost.populate(
-        'author',
-        '_id name profileImagePath'
-    )
-
-    const io = socketIO.getIO()
-    User.findById(userId).then((user) => {
-        sendNotificationOnPosting(populatedPost._id, user)
-        user.followers.forEach((follower) => {
-            io.in(follower._id.toString()).emit('newStatusPost', populatedPost)
-        })
-    })
-
-    res.status(200).json(newStatusPost)
 })
 
 exports.getAllStatusPostsOfAUser = asyncCatch(async (req, res, next) => {

@@ -17,10 +17,13 @@ import { RootState } from "../reducers/Store";
 import { setPostShow } from "../reducers/UtilsReducer";
 import Colors from "../constants/Colors";
 import * as ImagePicker from "expo-image-picker";
+import * as MediaLibrary from "expo-media-library";
 import { Toast } from "../components/ui/Toast";
 import { setStatus } from "../reducers/LoadingReducer";
 import VideoPlayer from "react-native-video-controls";
 import { createNewPost } from "../api/statusPostApi";
+const { v4: uuidv4 } = require("uuid");
+
 function PostScreen() {
     const [mediaFiles, setMediaFiles] = useState([]);
     const [description, setDescription] = useState("");
@@ -41,9 +44,6 @@ function PostScreen() {
             Toast("Please enter something");
             return;
         }
-
-        console.log("description here:");
-        console.log(description);
 
         toggleModal();
         dispatch(setStatus(true));
@@ -115,27 +115,30 @@ function PostScreen() {
         }
 
         try {
-            const { status } =
-                await ImagePicker.requestMediaLibraryPermissionsAsync();
+            const { status } = await MediaLibrary.requestPermissionsAsync();
             if (status !== "granted") {
                 Toast("Permission to access media library denied");
                 return;
             }
 
             const result = await ImagePicker.launchImageLibraryAsync({
-                allowsEditing: false,
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: false,
                 quality: 0.8,
-                multiple: true,
+                allowsMultipleSelection: true,
             });
 
             if (!result.canceled) {
-                const selectedImages = result.selected.map((image) => ({
-                    uri: image.uri,
-                    type: "image/jpeg",
-                    name: "photo.jpg",
-                }));
-
+                var selectedImages = [];
+                let i = 1;
+                result.assets.forEach((image) => {
+                    selectedImages.push({
+                        uri: image.uri,
+                        type: "image/jpeg",
+                        name: uuidv4() + i + "_post-file",
+                    });
+                    i += 1;
+                });
                 setMediaFiles([...mediaFiles, ...selectedImages]);
             }
         } catch (error) {

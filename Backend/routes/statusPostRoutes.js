@@ -17,8 +17,7 @@ router
         authController.isUser,
         authController.isOwnerOfThePath,
         upload.any(),
-        s3Controller.uploadMediaFiles,
-        statusPostController.createNewStatusPost
+        s3Controller.uploadPostFiles
     )
 
 router

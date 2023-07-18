@@ -18,12 +18,7 @@ router
         authController.isUser,
         statusCommentController.getAllCommentsOfStatusPost
     )
-    .post(
-        authController.isUser,
-        upload.any(),
-        s3Controller.uploadMediaFiles,
-        statusCommentController.createNewComment
-    )
+    .post(authController.isUser, upload.any(), s3Controller.uploadMediaFiles)
 
 router
     .route('/:commentId')
