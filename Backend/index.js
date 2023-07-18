@@ -39,14 +39,7 @@ app.use('', authRouter)
 app.post('/email-search', stringSearchController.searchByEmail)
 app.post('/name-search', stringSearchController.searchByName)
 app.use('/chatroom', chatRouter)
-app.post(
-    '/upload-image',
-    s3Controller.uploadMediaFiles.single('media-file'),
-    (req, res) => {
-        if (req.file.location) res.status(200).json(req.file.location)
-        else res.status(500).json('Unable to upload image')
-    }
-)
+app.post('/upload-image', s3Controller.uploadMediaFiles)
 app.use('/s/:statusPostId/comment', statusCommentRouter)
 app.get('/s/:statusPostId', statusPostController.getStatusPostById)
 app.get('/story/:storyId', storyController.getStoryById)

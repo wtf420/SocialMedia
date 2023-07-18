@@ -54,9 +54,9 @@ export default function PostStoryScreen({ navigation }) {
 
             if (!result.canceled) {
                 const selectedMedia = {
-                    uri: result.uri,
-                    type: result.type,
-                    name: result.uri.split("/").pop(),
+                    uri: result.assets[0].uri,
+                    type: result.assets[0].type,
+                    name: result.assets[0].uri.split("/").pop(),
                 };
                 console.log(selectedMedia);
                 setMediaFiles(selectedMedia);
@@ -111,6 +111,7 @@ export default function PostStoryScreen({ navigation }) {
             })
             .catch((error) => Toast(error.message))
             .finally(() => dispatch(setStatus(false)));
+        dispatch(setStatus(false));
     };
 
     const renderImage = (image) => {

@@ -15,7 +15,7 @@ router
     )
     .post(
         authController.isUser,
-        s3Controller.uploadMediaFiles.single('media-file'),
+        s3Controller.uploadMediaFiles,
         statusCommentController.createNewComment
     )
 

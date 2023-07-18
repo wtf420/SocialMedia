@@ -1,51 +1,87 @@
-import { createSlice } from "@reduxjs/toolkit";
+import ApiManager from "./ApiManager";
 
-const initialState = {
-  Main: [],
-  Sub: []
+export const getStoryById = async (storyId, token) => {
+    try {
+        const result = await ApiManager(`/story/${storyId}`, {
+            method: "GET",
+            headers: {
+                Authorization: "Bearer " + token,
+            },
+        });
+        return result;
+    } catch (error) {
+        return error;
+    }
 };
 
-const StorySlice = createSlice({
-  name: "Story",
-  initialState,
-  reducers: {
-    pushStory: (state, action) => {
-      state.Main.push(action.payload);
-    },
-    pushStorySub: (state, action) => {
-      const index = state.Sub.findIndex(item => item._id === action.payload._id);
-      if (index === -1) state.Sub.push(action.payload);
-    },
-    deleteStory: (state, action) => {
-      const index = state.Main.findIndex(item => item._id === action.payload);
-      if (index !== -1) state.Main.splice(index, 1);
-
-      const indexSub = state.Sub.findIndex(item => item._id === action.payload);
-      if (indexSub !== -1) state.Sub.splice(indexSub, 1);
-    },
-    toggleLikeStory: (state, action) => {
-      const index = state.Main.findIndex(item => item._id === action.payload);
-      if (index !== -1) state.Main[index].isLiked = !state.Main[index].isLiked;
-
-      const indexSub = state.Sub.findIndex(item => item._id === action.payload);
-      if (indexSub !== -1) state.Sub[indexSub].isLiked = !state.Sub[indexSub].isLiked;
-    },
-    clearStory: state => {
-      state.Main = [];
-      state.Sub = [];
-    },
-    clearStorySub: state => {
-      state.Sub = [];
+export const getAllStory = async (userId, token) => {
+    try {
+        const result = await ApiManager(`/${userId}/story`, {
+            method: "GET",
+            headers: {
+                Authorization: "Bearer " + token,
+            },
+        });
+        return result;
+    } catch (error) {
+        return error;
     }
-  }
-});
+};
 
-export const {
-  pushStory,
-  pushStorySub,
-  deleteStory,
-  toggleLikeStory,
-  clearStory,
-  clearStorySub
-} = StorySlice.actions;
-export default StorySlice.reducer;
+export const getStoryFeed = async (userId, token) => {
+    try {
+        const result = await ApiManager(`/${userId}/story-feed`, {
+            method: "GET",
+            headers: {
+                Authorization: "Bearer " + token,
+            },
+        });
+        return result;
+    } catch (error) {
+        return error;
+    }
+};
+
+export const createStory = async (data, userId, token) => {
+    try {
+        const result = await ApiManager(`/${userId}/story`, {
+            method: "POST",
+            headers: {
+                Authorization: "Bearer " + token,
+                "Content-Type": "multipart/form-data",
+            },
+            data: data,
+        });
+        return result;
+    } catch (error) {
+        return error;
+    }
+};
+
+export const likeStory = async (authorId, storyId, token) => {
+    try {
+        const result = await ApiManager(`/${authorId}/story/${storyId}`, {
+            method: "PATCH",
+            headers: {
+                Authorization: "Bearer " + token,
+            },
+        });
+        return result;
+    } catch (error) {
+        return error;
+    }
+};
+
+export const deleteStoryApi = async (authorId, storyId, token) => {
+    try {
+        const result = await ApiManager(`/${authorId}/story/${storyId}`, {
+            method: "DELETE",
+            headers: {
+                Authorization: "Bearer " + token,
+            },
+        });
+        return result;
+    } catch (error) {
+        return error;
+    }
+};

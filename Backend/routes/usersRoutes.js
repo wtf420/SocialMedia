@@ -5,8 +5,12 @@ const chatController = require('../controllers/chatController')
 const friendController = require('../controllers/friendController')
 const s3Controller = require('../controllers/s3Controller')
 
-const router = express.Router({ mergeParams: true })
+const multer = require('multer')
 
+const storage = multer.memoryStorage()
+const upload = multer({ storage })
+
+const router = express.Router({ mergeParams: true })
 router.route('/:userId/follow').post(usersController.followUserById)
 router.route('/:userId/unfollow').post(usersController.unfollowUserById)
 
@@ -19,8 +23,8 @@ router
     .post(
         authController.isUser,
         authController.isOwnerOfThePath,
-        s3Controller.uploadMediaFiles.single('profile-image'),
-        usersController.updateProfileImage
+        upload.single('image'),
+        s3Controller.uploadProfileImage
     )
 
 router
@@ -28,8 +32,8 @@ router
     .post(
         authController.isUser,
         authController.isOwnerOfThePath,
-        s3Controller.uploadMediaFiles.single('background-image'),
-        usersController.updateUserBackground
+        upload.single('image'),
+        s3Controller.uploadBackgroundImage
     )
 
 router
