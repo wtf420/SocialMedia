@@ -41,6 +41,10 @@ function PostScreen() {
             Toast("Please enter something");
             return;
         }
+
+        console.log("description here:");
+        console.log(description);
+
         toggleModal();
         dispatch(setStatus(true));
 

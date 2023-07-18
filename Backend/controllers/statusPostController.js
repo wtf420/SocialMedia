@@ -71,6 +71,8 @@ exports.getStatusPostById = asyncCatch(async (req, res, next) => {
 exports.createNewStatusPost = asyncCatch(async (req, res, next) => {
     const { userId } = req.params
 
+    console.log(req.body.description)
+
     const mediaFiles = []
     if (req.files) {
         req.files.forEach((file) => {
