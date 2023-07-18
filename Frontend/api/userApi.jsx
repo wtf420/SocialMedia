@@ -72,8 +72,6 @@ export const postAvatarImg = async (dataForm, userId, token) => {
 
 export const postBackgrImg = async (data, userId, token) => {
     try {
-        console.log("post api here");
-        console.log(data);
         const result = await ApiManager(`/${userId}/background-image`, {
             method: "post",
             headers: {

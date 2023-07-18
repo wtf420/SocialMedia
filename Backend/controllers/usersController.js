@@ -2,7 +2,6 @@ const User = require('../models/User')
 const asyncCatch = require('../utils/asyncCatch')
 const AppError = require('../utils/AppError')
 const s3Controller = require('./s3Controller')
-const upload = require('./multerConfig')
 
 exports.updateProfileImage = asyncCatch(async (req, res, next) => {
     if (!req.file || !req.file.location)
@@ -17,25 +16,6 @@ exports.updateProfileImage = asyncCatch(async (req, res, next) => {
     await user.save()
 
     res.status(200).json({ imagePath: req.file.location })
-})
-
-exports.updateUserBackground = asyncCatch(async (req, res, next) => {
-    const { userId } = req.params
-    const user = await User.findById(userId)
-    if (user.backgroundImagePath) {
-        // Delete the old file if it exists
-        console.log(user)
-        s3Controller.deleteMediaFile(user.backgroundImagePath)
-    }
-    console.log('file in user here:')
-    console.log(req.file)
-
-    user.backgroundImagePath = req.file ? req.file.originalname : null
-    await user.save()
-
-    res.status(200).json({
-        backgroundImagePath: req.file ? req.file.originalname : null,
-    })
 })
 
 exports.getUserById = asyncCatch(async (req, res, next) => {

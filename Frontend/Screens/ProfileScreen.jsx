@@ -24,6 +24,7 @@ import Icon, { Icons } from "../components/ui/Icons";
 import { clearStorySub, pushStorySub } from "../reducers/StoryReducer";
 import { getAllStory } from "../api/storyApi";
 import { useIsFocused } from "@react-navigation/native";
+const { v4: uuidv4 } = require("uuid");
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -71,7 +72,7 @@ function ProfileScreen({ navigation }) {
         const dataForm = new FormData();
         dataForm.append("profile-image", {
             uri: image.path,
-            type: image.mime,
+            type: "image/png",
             name: image.filename || "profile-image",
         });
         dispatch(setStatus(true));
@@ -97,9 +98,9 @@ function ProfileScreen({ navigation }) {
     const postBackgroundImage = async (image) => {
         let dataForm = new FormData();
         dataForm.append("image", {
-            name: new Date() + "_bg-Image",
+            name: uuidv4() + "_bg-image",
             uri: image.uri,
-            type: "image/jpg",
+            type: "image/png",
         });
 
         dispatch(setStatus(true));

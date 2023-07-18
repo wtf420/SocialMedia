@@ -33,8 +33,7 @@ router
         authController.isUser,
         authController.isOwnerOfThePath,
         upload.single('image'),
-        s3Controller.uploadMediaFiles,
-        usersController.updateUserBackground
+        s3Controller.uploadMediaFiles
     )
 
 router
