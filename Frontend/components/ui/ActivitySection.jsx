@@ -1,44 +1,42 @@
 /* eslint-disable react-native/no-inline-styles */
-import { TouchableOpacity } from "@gorhom/bottom-sheet"
-import React, { useState } from "react"
-import { Dimensions } from "react-native"
-import {
-  FlatList,
-  StyleSheet,
-  Text,
-  Image,
-  View,
-  Pressable
-} from "react-native"
-import { useDispatch, useSelector } from "react-redux"
-import { Toast } from "./Toast"
+import { TouchableOpacity } from '@gorhom/bottom-sheet';
+import React, { useEffect, useState } from 'react';
+import { Dimensions } from 'react-native';
+import { FlatList, StyleSheet, Text, Image, View, Pressable } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { setPostShow } from '../../reducers/UtilsReducer';
+import { Toast } from './Toast';
 import {
   getAStatusPostById,
-  getAllStatusPostOfUser
-} from "../../api/statusPostApi"
-import { getTimeToNow } from "../../utils/Utils"
-import { useFocusEffect } from "@react-navigation/native"
-import { pushStatusPostsSub } from "../../reducers/StatusPostReducer"
-const screenWidth = Dimensions.get("screen").width
+  getAllStatusPostOfUser,
+} from '../../api/statusPostApi';
+import { RootState } from '../../reducers/Store';
+import { getTimeToNow } from '../../utils/Utils';
+import { useFocusEffect } from '@react-navigation/native';
+import {
+  clearStatusPostsSub,
+  pushStatusPostsSub,
+} from '../../reducers/StatusPostReducer';
+const screenWidth = Dimensions.get('screen').width;
 
 const Post = ({ navigation, item }) => {
   const navigateToDetail = () => {
-    navigation.push("detailStatus", { idPost: item._id })
-  }
+    navigation.push('detailStatus', { idPost: item._id });
+  };
 
   return (
     <Pressable style={styles.post} onPress={navigateToDetail}>
       <Text style={styles.time}>{getTimeToNow(item.createdAt)}</Text>
       <Text style={styles.user}>
-        {item.author.name}{" "}
-        <Text style={{ fontWeight: "normal", color: "#999" }}>
-          {item.sharedLink ? "shared" : "posted"}{" "}
+        {item.author.name}{' '}
+        <Text style={{ fontWeight: 'normal', color: '#999' }}>
+          {item.sharedLink ? 'shared' : 'posted'}{' '}
         </Text>
       </Text>
 
-      <View style={{ flexDirection: "row" }}>
+      <View style={{ flexDirection: 'row' }}>
         {item.mediaFiles[0] &&
-          (item.mediaFiles[0].fileType === "Image" ? (
+          (item.mediaFiles[0].fileType === 'Image' ? (
             <Image
               style={styles.image}
               source={{ uri: item.mediaFiles[0].location }}
@@ -46,7 +44,7 @@ const Post = ({ navigation, item }) => {
           ) : (
             <Image
               style={styles.image}
-              source={require("../../assets/images/Thumbnail.png")}
+              source={require('../../assets/images/Thumbnail.png')}
             />
           ))}
         <View style={{ flex: 1 }}>
@@ -56,70 +54,70 @@ const Post = ({ navigation, item }) => {
         </View>
       </View>
     </Pressable>
-  )
-}
+  );
+};
 
-const ActivitySection = props => {
-  const dispatch = useDispatch()
-  const { navigation, userId, followCount } = props
-  const [posts, setPosts] = useState([])
+const ActivitySection = (props) => {
+  const dispatch = useDispatch();
+  const { navigation, userId, followCount } = props;
+  const [posts, setPosts] = useState([]);
 
-  const jwt = useSelector(state => state.token.key)
-  const subStory = useSelector(state => state.story.Sub)
+  const jwt = useSelector((state) => state.token.key);
+  const subStory = useSelector((state) => state.story.Sub);
 
   const viewStories = () => {
-    if (subStory.length > 0) navigation.push("story", { index: 0, type: 1 })
-    else Toast("No story to view")
-  }
+    if (subStory.length > 0) navigation.push('story', { index: 0, type: 1 });
+    else Toast('No story to view');
+  };
 
-  const getPostById = async id => {
+  const getPostById = async (id) => {
     try {
-      const response = await getAStatusPostById(jwt, id)
+      const response = await getAStatusPostById(jwt, id);
       if (response.status === 200) {
-        const data = response.data
-        dispatch(pushStatusPostsSub(data))
+        const data = response.data;
+        dispatch(pushStatusPostsSub(data));
       }
     } catch (error) {
-      Toast(error.message)
+      Toast(error.message);
     }
-  }
+  };
 
   const getPosts = async () => {
     try {
-      const response = await getAllStatusPostOfUser(userId, jwt)
+      const response = await getAllStatusPostOfUser(userId, jwt);
       if (response.status === 200) {
-        setPosts(response.data.reverse())
+        setPosts(response.data.reverse());
         for (const postsub of response.data) {
-          dispatch(pushStatusPostsSub(postsub))
+          dispatch(pushStatusPostsSub(postsub));
           if (postsub.sharedLink) {
-            getPostById(postsub.sharedLink)
+            getPostById(postsub.sharedLink);
           }
         }
-      } else throw new Error(response.data.errorMessage)
+      } else throw new Error(response.data.errorMessage);
     } catch (error) {
-      Toast(error.message)
+      Toast(error.message);
     }
-  }
+  };
 
   useFocusEffect(
     React.useCallback(() => {
-      getPosts()
+      getPosts();
       // dispatch(clearStatusPostsSub());
 
       return () => {
         // Cleanup or cancel any pending requests if needed
-      }
+      };
     }, [])
-  )
+  );
 
   return (
     <View style={{ margin: 25 }}>
       <View
         style={{
-          flexDirection: "row",
-          alignItems: "center",
-          flexWrap: "wrap",
-          justifyContent: "space-between"
+          flexDirection: 'row',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          justifyContent: 'space-between',
         }}
       >
         <Text style={styles.title}>Activity</Text>
@@ -127,23 +125,21 @@ const ActivitySection = props => {
           style={{
             borderRadius: 20,
             borderWidth: 1,
-            overflow: "hidden",
-            borderColor: "#0565a0ff"
+            overflow: 'hidden',
+            borderColor: '#0565a0ff',
           }}
         >
           <Pressable
             onPress={viewStories}
-            android_ripple={{ color: "#7fc1ebff" }}
+            android_ripple={{ color: '#7fc1ebff' }}
             style={{
-              backgroundColor: "transparent",
+              backgroundColor: 'transparent',
               width: 100,
               height: 35,
-              justifyContent: "center"
+              justifyContent: 'center',
             }}
           >
-            <Text
-              style={{ textAlign: "center", fontSize: 18, color: "#0A66C2" }}
-            >
+            <Text style={{ textAlign: 'center', fontSize: 18, color: '#0A66C2' }}>
               Stories
             </Text>
           </Pressable>
@@ -155,59 +151,59 @@ const ActivitySection = props => {
       <FlatList
         data={posts.slice(0, 2)}
         renderItem={({ item }) => <Post navigation={navigation} item={item} />}
-        keyExtractor={(item, index) => "key" + index}
+        keyExtractor={(item, index) => 'key' + index}
         showsVerticalScrollIndicator={false}
         scrollEnabled={false}
       />
       <TouchableOpacity
-        onPress={() => navigation.navigate("postOfUser", { userId: userId })}
-        style={{ justifyContent: "center", alignItems: "center" }}
+        onPress={() => navigation.navigate('postOfUser', { userId: userId })}
+        style={{ justifyContent: 'center', alignItems: 'center' }}
       >
         <Text
-          style={[styles.title, { fontWeight: "normal", marginVertical: 20 }]}
+          style={[styles.title, { fontWeight: 'normal', marginVertical: 20 }]}
         >
           Show all activity ➔
         </Text>
       </TouchableOpacity>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   post: {
     marginTop: 10,
-    borderBottomColor: "#999",
-    borderBottomWidth: 0.5
+    borderBottomColor: '#999',
+    borderBottomWidth: 0.5,
   },
   time: {
     fontSize: 12,
-    color: "#999"
+    color: '#999',
   },
   user: {
     fontSize: 14,
-    fontWeight: "bold",
-    color: "black"
+    fontWeight: 'bold',
+    color: 'black',
   },
   content: {
     fontSize: 16,
-    color: "black",
+    color: 'black',
     marginBottom: 10,
-    padding: 5
+    padding: 5,
   },
   image: {
     width: 100,
     height: 100,
-    margin: 10
+    margin: 10,
   },
   title: {
     fontSize: 20,
-    fontWeight: "bold",
-    color: "black"
+    fontWeight: 'bold',
+    color: 'black',
   },
   numFollow: {
-    fontWeight: "bold",
-    color: "#4228e8"
-  }
-})
+    fontWeight: 'bold',
+    color: '#4228e8',
+  },
+});
 
-export default ActivitySection
+export default ActivitySection;

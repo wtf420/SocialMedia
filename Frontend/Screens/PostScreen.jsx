@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -18,13 +17,10 @@ import { RootState } from '../reducers/Store';
 import { setPostShow } from '../reducers/UtilsReducer';
 import Colors from '../constants/Colors';
 import * as ImagePicker from 'expo-image-picker';
-import { ToastAndroid } from 'react-native';
-import { createNewPost } from '../api/statusPostApi';
 import { Toast } from '../components/ui/Toast';
-
 import { setStatus } from '../reducers/LoadingReducer';
 import VideoPlayer from 'react-native-video-controls';
-
+import { createNewPost } from '../api/statusPostApi';
 function PostScreen() {
   const [mediaFiles, setMediaFiles] = useState([]);
   const [description, setDescription] = useState('');
@@ -74,97 +70,106 @@ function PostScreen() {
       });
   };
 
-  const takePhotoFromCamera = () => {
+  const takePhotoFromCamera = async () => {
     if (mediaFiles.length > 0 && mediaFiles[0].type === 'video/mp4') {
       Toast('Only multiple images can be selected!');
       return;
     }
-    ImagePicker.openCamera({
-      height: 140,
-      width: 140,
-      cropperCircleOverlay: true,
-    })
-      .then((image) => {
-        console.log(image);
+
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Toast('Permission to access camera denied');
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: false,
+        quality: 0.8,
+      });
+
+      if (!result.cancelled) {
         setMediaFiles([
           ...mediaFiles,
           {
-            uri: image.path,
-            type: image.mime,
-            name: image.path.split('/').pop(),
+            uri: result.uri,
+            type: result.type,
+            name: result.uri.split('/').pop(),
           },
         ]);
-      })
-      .catch((error) => Toast(error.message));
+      }
+    } catch (error) {
+      Toast(error.message);
+    }
   };
 
   const choosePhotoFromLibrary = async () => {
     if (mediaFiles.length > 0 && mediaFiles[0].type === 'video/mp4') {
-      ToastAndroid.show('Only multiple images can be selected!', ToastAndroid.SHORT);
+      Toast('Only multiple images can be selected!');
       return;
     }
-  
+
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
-        ToastAndroid.show('Permission to access media library denied', ToastAndroid.SHORT);
+        Toast('Permission to access media library denied');
         return;
       }
-  
+
       const result = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: false,
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsMultipleSelection: true,
         quality: 0.8,
-        maxSelectedAssets: 10,
+        multiple: true,
       });
-  
+
       if (!result.cancelled) {
-        const selectedImages = result.selected.map((asset) => ({
-          uri: asset.uri,
+        const selectedImages = result.selected.map((image) => ({
+          uri: image.uri,
           type: 'image/jpeg',
           name: 'photo.jpg',
         }));
-  
+
         setMediaFiles([...mediaFiles, ...selectedImages]);
       }
     } catch (error) {
-      ToastAndroid.show(error.message, ToastAndroid.SHORT);
+      Toast(error.message);
     }
   };
-  
+
   const selectVideo = async () => {
     if (mediaFiles.length > 0 && mediaFiles[0].type === 'image/jpeg') {
-      ToastAndroid.show('Only multiple images can be selected!', ToastAndroid.SHORT);
+      Toast('Only multiple videos can be selected!');
       return;
     }
-  
+
     try {
-      const { status } = await MediaLibrary.requestPermissionsAsync();
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
-        ToastAndroid.show('Permission to access media library denied', ToastAndroid.SHORT);
+        Toast('Permission to access media library denied');
         return;
       }
-  
+
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Videos,
         allowsEditing: false,
         quality: 1,
       });
-  
+
       if (!result.cancelled) {
-        const assetInfo = await MediaLibrary.getAssetInfoAsync(result.uri);
         setMediaFiles([
           {
-            uri: assetInfo.uri,
-            type: 'video/mp4',
-            name: assetInfo.filename || 'video.mp4',
+            uri: result.uri,
+            type: result.type,
+            name: result.uri.split('/').pop(),
           },
         ]);
       }
     } catch (error) {
-      ToastAndroid.show(error.message, ToastAndroid.SHORT);
+      Toast(error.message);
     }
   };
+
   useEffect(() => {
     setDescription('');
     setMediaFiles([]);
@@ -180,11 +185,9 @@ function PostScreen() {
               height: 230,
               backgroundColor: 'gray',
               width: screenWidth,
-            }}
-          >
+            }}>
             <VideoPlayer
               controls={true}
-              disableVolume={true}
               disableFullscreen={true}
               disableBack={true}
               source={{ uri: item.uri }}
@@ -211,13 +214,11 @@ function PostScreen() {
             right: 5,
             backgroundColor: Colors.white,
             borderRadius: 50,
-          }}
-        >
+          }}>
           <TouchableOpacity
             onPress={() =>
               setMediaFiles(mediaFiles.filter((i) => i.uri != item.uri))
-            }
-          >
+            }>
             <Icon
               type={Icons.AntDesign}
               name="closecircle"
@@ -234,10 +235,9 @@ function PostScreen() {
       onBackdropPress={() => dispatch(setPostShow(false))}
       onBackButtonPress={() => dispatch(setPostShow(false))}
       isVisible={postVisible}
-      style={{ margin: 0 }}
-    >
+      style={{ margin: 0 }}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
-        <View /*style={styles.modalContent}*/>
+        <View style={styles.modalContent}>
           <View style={{ height: 70 }} />
           <View style={{ backgroundColor: 'white', flex: 1 }}>
             <View
@@ -245,8 +245,7 @@ function PostScreen() {
                 paddingHorizontal: 20,
                 marginTop: 20,
                 flex: 1,
-              }}
-            >
+              }}>
               <TextInput
                 value={description}
                 onChangeText={setDescription}
@@ -277,8 +276,12 @@ function PostScreen() {
       )}
       <View style={{ height: 65 }} />
 
-      <View /*style={styles.topview}*/>
-        <View style={{ margin: 20, flexDirection: 'row' }}>
+      <View style={styles.topView}>
+        <View
+          style={{
+            margin: 20,
+            flexDirection: 'row',
+          }}>
           <TouchableOpacity onPress={toggleModal} style={{ marginTop: 3 }}>
             <Icon type={Icons.AntDesign} name="close" />
           </TouchableOpacity>
@@ -300,14 +303,12 @@ function PostScreen() {
               marginTop: 3,
               marginLeft: 'auto',
               flexDirection: 'row',
-            }}
-          >
+            }}>
             <TouchableOpacity
               style={{ marginTop: 5 }}
               onPress={() => {
                 console.log(mediaFiles);
-              }}
-            >
+              }}>
               <Icon type={Icons.Feather} name="clock" />
             </TouchableOpacity>
             <TouchableOpacity onPress={postStatus} style={{ marginLeft: 20 }}>
@@ -317,11 +318,13 @@ function PostScreen() {
                   paddingHorizontal: 15,
                   paddingVertical: 5,
                   borderRadius: 15,
-                }}
-              >
+                }}>
                 <Text
-                  style={{ fontSize: 16, color: 'white', fontWeight: 'bold' }}
-                >
+                  style={{
+                    fontSize: 16,
+                    color: 'white',
+                    fontWeight: 'bold',
+                  }}>
                   Post
                 </Text>
               </View>
@@ -337,8 +340,7 @@ function PostScreen() {
           left: 0,
           right: 0,
           backgroundColor: Colors.white,
-        }}
-      >
+        }}>
         <View style={{ flexDirection: 'row', padding: 20 }}>
           <TouchableOpacity onPress={takePhotoFromCamera}>
             <Icon type={Icons.Entypo} name="camera" size={25} />
@@ -353,8 +355,7 @@ function PostScreen() {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={choosePhotoFromLibrary}
-            style={{ marginLeft: 20 }}
-          >
+            style={{ marginLeft: 20 }}>
             <Icon type={Icons.FontAwesome} name="photo" size={25} />
           </TouchableOpacity>
           <View style={{ marginLeft: 'auto' }}>
@@ -372,5 +373,20 @@ function PostScreen() {
     </Modal>
   );
 }
+
 export default PostScreen;
 
+const styles = StyleSheet.create({
+  modalContent: {
+    backgroundColor: '#fff',
+    flex: 1,
+  },
+  topView: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'white',
+    elevation: 5,
+  },
+});

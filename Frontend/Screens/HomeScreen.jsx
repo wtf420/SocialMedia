@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   RefreshControl,
 } from 'react-native';
+import ShowPosts from '../components/ui/ShowPosts';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../reducers/Store';
 import { Toast } from '../components/ui/Toast';
@@ -28,14 +29,13 @@ import {
 import { Image } from 'react-native-animatable';
 import StoriesList from '../components/ui/StoriesList';
 import { clearStory, pushStory } from '../reducers/StoryReducer';
+import { getStoryFeed } from '../api/storyApi';
 
 export default function HomeScreen({ navigation }) {
   const token = useSelector((state) => state.token.key);
   const uid = useSelector((state) => state.uid.id);
 
-  const StatusData = useSelector(
-    (state) => state.statusPost.HomePage
-  );
+  const StatusData = useSelector((state) => state.statusPost.HomePage);
 
   const [currentPage, setCurrentPage] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
