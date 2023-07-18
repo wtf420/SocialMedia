@@ -1,13 +1,19 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from "react"
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native"
-import Icon, { Icons } from "../components/ui/Icons"
-import InvitationsList from "../components/ui/InvitationsList"
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
+import Icon, { Icons } from '../components/ui/Icons';
+import InvitationsList from '../components/ui/InvitationsList';
 
 function InvitationsScreen({ navigation }) {
   const navigateBack = () => {
-    navigation.goBack()
-  }
+    navigation.goBack();
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -20,7 +26,7 @@ function InvitationsScreen({ navigation }) {
         </View>
       </View>
       <View style={styles.topView}>
-        <View style={{ margin: 15, flexDirection: "row" }}>
+        <View style={{ margin: 15, flexDirection: 'row' }}>
           <TouchableOpacity onPress={navigateBack} style={{ marginTop: -3 }}>
             <Icon type={Icons.Ionicons} name="arrow-back" size={35} />
           </TouchableOpacity>
@@ -28,42 +34,42 @@ function InvitationsScreen({ navigation }) {
         </View>
       </View>
     </View>
-  )
+  );
 }
-export default InvitationsScreen
+export default InvitationsScreen;
 const styles = StyleSheet.create({
   modalContent: {
-    backgroundColor: "#fff",
-    flex: 1
+    backgroundColor: '#fff',
+    flex: 1,
   },
   title: {
     fontSize: 20,
-    color: "black",
+    color: 'black',
     marginLeft: 30,
-    fontWeight: "bold"
+    fontWeight: 'bold',
   },
   bottomView: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
     height: 70,
-    justifyContent: "center",
-    alignItems: "center",
-    borderTopColor: "#ccc",
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderTopColor: '#ccc',
     borderTopWidth: 1,
-    backgroundColor: "white"
+    backgroundColor: 'white',
   },
   bottomText: {
-    color: "white",
-    fontSize: 18
+    color: 'white',
+    fontSize: 18,
   },
   topView: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    backgroundColor: "white",
-    elevation: 5
-  }
-})
+    backgroundColor: 'white',
+    elevation: 5,
+  },
+});

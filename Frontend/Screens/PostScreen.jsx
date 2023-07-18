@@ -1,407 +1,392 @@
-/* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    TextInput,
-    Image,
-    ScrollView,
-    FlatList,
-    Dimensions,
-} from "react-native";
-import Modal from "react-native-modal";
-import Icon, { Icons } from "../components/ui/Icons";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../reducers/Store";
-import { setPostShow } from "../reducers/UtilsReducer";
-import Colors from "../constants/Colors";
-import * as ImagePicker from "expo-image-picker";
-import { ToastAndroid } from "react-native";
-import { createNewPost } from "../api/statusPostApi";
-import { Toast } from "../components/ui/Toast";
-
-import { setStatus } from "../reducers/LoadingReducer";
-import VideoPlayer from "react-native-video-controls";
-
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  Image,
+  ScrollView,
+  FlatList,
+  Dimensions,
+} from 'react-native';
+import Modal from 'react-native-modal';
+import Icon, { Icons } from '../components/ui/Icons';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../reducers/Store';
+import { setPostShow } from '../reducers/UtilsReducer';
+import Colors from '../constants/Colors';
+import * as ImagePicker from 'expo-image-picker';
+import { Toast } from '../components/ui/Toast';
+import { setStatus } from '../reducers/LoadingReducer';
+import VideoPlayer from 'react-native-video-controls';
+import { createNewPost } from '../api/statusPostApi';
 function PostScreen() {
-    const [mediaFiles, setMediaFiles] = useState([]);
-    const [description, setDescription] = useState("");
+  const [mediaFiles, setMediaFiles] = useState([]);
+  const [description, setDescription] = useState('');
 
-    const user = useSelector((state) => state.userInfo);
-    const postVisible = useSelector((state) => state.Utils.postShow);
-    const token = useSelector((state) => state.token.key);
-    const uid = useSelector((state) => state.uid.id);
+  const user = useSelector((state) => state.userInfo);
+  const postVisible = useSelector((state) => state.Utils.postShow);
+  const token = useSelector((state) => state.token.key);
+  const uid = useSelector((state) => state.uid.id);
 
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
-    const toggleModal = () => {
-        dispatch(setPostShow(!postVisible));
-    };
+  const toggleModal = () => {
+    dispatch(setPostShow(!postVisible));
+  };
 
-    const postStatus = () => {
-        if (description === "" && mediaFiles.length === 0) {
-            Toast("Please enter something");
-            return;
+  const postStatus = () => {
+    if (description === '' && mediaFiles.length === 0) {
+      Toast('Please enter something');
+      return;
+    }
+    toggleModal();
+    dispatch(setStatus(true));
+
+    const dataForm = new FormData();
+
+    for (let i = 0; i < mediaFiles.length; i++)
+      dataForm.append('media-files', mediaFiles[i]);
+
+    dataForm.append('description', description);
+
+    createNewPost(dataForm, uid, token)
+      .then((response) => {
+        if (response.status === 200) {
+          console.log(response.data);
+          return response.data;
+        } else {
+          console.log(response.status);
+          throw new Error(response.data.errorMessage);
         }
-        toggleModal();
-        dispatch(setStatus(true));
+      })
+      .then((data) => {
+        Toast('Post successfully!');
+      })
+      .catch((error) => Toast(error.message))
+      .finally(() => {
+        dispatch(setStatus(false));
+      });
+  };
 
-        const dataForm = new FormData();
+  const takePhotoFromCamera = async () => {
+    if (mediaFiles.length > 0 && mediaFiles[0].type === 'video/mp4') {
+      Toast('Only multiple images can be selected!');
+      return;
+    }
 
-        for (let i = 0; i < mediaFiles.length; i++)
-            dataForm.append("media-files", mediaFiles[i]);
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Toast('Permission to access camera denied');
+        return;
+      }
 
-        dataForm.append("description", description);
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: false,
+        quality: 0.8,
+      });
 
-        createNewPost(dataForm, uid, token)
-            .then((response) => {
-                if (response.status === 200) {
-                    console.log(response.data);
-                    return response.data;
-                } else {
-                    console.log(response.status);
-                    throw new Error(response.data.errorMessage);
-                }
-            })
-            .then((data) => {
-                Toast("Post successfully!");
-            })
-            .catch((error) => Toast(error.message))
-            .finally(() => {
-                dispatch(setStatus(false));
-            });
-    };
+      if (!result.cancelled) {
+        setMediaFiles([
+          ...mediaFiles,
+          {
+            uri: result.uri,
+            type: result.type,
+            name: result.uri.split('/').pop(),
+          },
+        ]);
+      }
+    } catch (error) {
+      Toast(error.message);
+    }
+  };
 
-    const takePhotoFromCamera = () => {
-        if (mediaFiles.length > 0 && mediaFiles[0].type === "video/mp4") {
-            Toast("Only multiple images can be selected!");
-            return;
-        }
-        ImagePicker.openCamera({
-            height: 140,
-            width: 140,
-            cropperCircleOverlay: true,
-        })
-            .then((image) => {
-                console.log(image);
-                setMediaFiles([
-                    ...mediaFiles,
-                    {
-                        uri: image.path,
-                        type: image.mime,
-                        name: image.path.split("/").pop(),
-                    },
-                ]);
-            })
-            .catch((error) => Toast(error.message));
-    };
+  const choosePhotoFromLibrary = async () => {
+    if (mediaFiles.length > 0 && mediaFiles[0].type === 'video/mp4') {
+      Toast('Only multiple images can be selected!');
+      return;
+    }
 
-    const choosePhotoFromLibrary = async () => {
-        if (mediaFiles.length > 0 && mediaFiles[0].type === "video/mp4") {
-            ToastAndroid.show(
-                "Only multiple images can be selected!",
-                ToastAndroid.SHORT
-            );
-            return;
-        }
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Toast('Permission to access media library denied');
+        return;
+      }
 
-        try {
-            const { status } =
-                await ImagePicker.requestMediaLibraryPermissionsAsync();
-            if (status !== "granted") {
-                ToastAndroid.show(
-                    "Permission to access media library denied",
-                    ToastAndroid.SHORT
-                );
-                return;
-            }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: false,
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 0.8,
+        multiple: true,
+      });
 
-            const result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Images,
-                allowsMultipleSelection: true,
-                quality: 0.8,
-                maxSelectedAssets: 10,
-            });
+      if (!result.cancelled) {
+        const selectedImages = result.selected.map((image) => ({
+          uri: image.uri,
+          type: 'image/jpeg',
+          name: 'photo.jpg',
+        }));
 
-            if (!result.cancelled) {
-                const selectedImages = result.selected.map((asset) => ({
-                    uri: asset.uri,
-                    type: "image/jpeg",
-                    name: "photo.jpg",
-                }));
+        setMediaFiles([...mediaFiles, ...selectedImages]);
+      }
+    } catch (error) {
+      Toast(error.message);
+    }
+  };
 
-                setMediaFiles([...mediaFiles, ...selectedImages]);
-            }
-        } catch (error) {
-            ToastAndroid.show(error.message, ToastAndroid.SHORT);
-        }
-    };
+  const selectVideo = async () => {
+    if (mediaFiles.length > 0 && mediaFiles[0].type === 'image/jpeg') {
+      Toast('Only multiple videos can be selected!');
+      return;
+    }
 
-    const selectVideo = async () => {
-        if (mediaFiles.length > 0 && mediaFiles[0].type === "image/jpeg") {
-            ToastAndroid.show(
-                "Only multiple images can be selected!",
-                ToastAndroid.SHORT
-            );
-            return;
-        }
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Toast('Permission to access media library denied');
+        return;
+      }
 
-        try {
-            const { status } = await MediaLibrary.requestPermissionsAsync();
-            if (status !== "granted") {
-                ToastAndroid.show(
-                    "Permission to access media library denied",
-                    ToastAndroid.SHORT
-                );
-                return;
-            }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+        allowsEditing: false,
+        quality: 1,
+      });
 
-            const result = await ImagePicker.launchImageLibraryAsync({
-                mediaTypes: ImagePicker.MediaTypeOptions.Videos,
-                allowsEditing: false,
-                quality: 1,
-            });
+      if (!result.cancelled) {
+        setMediaFiles([
+          {
+            uri: result.uri,
+            type: result.type,
+            name: result.uri.split('/').pop(),
+          },
+        ]);
+      }
+    } catch (error) {
+      Toast(error.message);
+    }
+  };
 
-            if (!result.cancelled) {
-                const assetInfo = await MediaLibrary.getAssetInfoAsync(
-                    result.uri
-                );
-                setMediaFiles([
-                    {
-                        uri: assetInfo.uri,
-                        type: "video/mp4",
-                        name: assetInfo.filename || "video.mp4",
-                    },
-                ]);
-            }
-        } catch (error) {
-            ToastAndroid.show(error.message, ToastAndroid.SHORT);
-        }
-    };
-    useEffect(() => {
-        setDescription("");
-        setMediaFiles([]);
-    }, [postVisible]);
+  useEffect(() => {
+    setDescription('');
+    setMediaFiles([]);
+  }, [postVisible]);
 
-    const MedifafileView = ({ item }) => {
-        const screenWidth = Dimensions.get("window").width;
-        return (
-            <View style={{ flex: 1 }}>
-                {item.type === "video/mp4" ? (
-                    <View
-                        style={{
-                            height: 230,
-                            backgroundColor: "gray",
-                            width: screenWidth,
-                        }}
-                    >
-                        <VideoPlayer
-                            controls={true}
-                            disableVolume={true}
-                            disableFullscreen={true}
-                            disableBack={true}
-                            source={{ uri: item.uri }}
-                            style={{ width: "100%", height: "100%" }}
-                            paused={true}
-                        />
-                    </View>
-                ) : (
-                    <Image
-                        style={{
-                            height: 120,
-                            width: 160,
-                            borderRadius: 3,
-                            margin: 5,
-                        }}
-                        source={{ uri: item.uri }}
-                    />
-                )}
-
-                <View
-                    style={{
-                        position: "absolute",
-                        top: 5,
-                        right: 5,
-                        backgroundColor: Colors.white,
-                        borderRadius: 50,
-                    }}
-                >
-                    <TouchableOpacity
-                        onPress={() =>
-                            setMediaFiles(
-                                mediaFiles.filter((i) => i.uri != item.uri)
-                            )
-                        }
-                    >
-                        <Icon
-                            type={Icons.AntDesign}
-                            name="closecircle"
-                            color={Colors.darkOverlayColor}
-                        />
-                    </TouchableOpacity>
-                </View>
-            </View>
-        );
-    };
-
+  const MedifafileView = ({ item }) => {
+    const screenWidth = Dimensions.get('window').width;
     return (
-        <Modal
-            onBackdropPress={() => dispatch(setPostShow(false))}
-            onBackButtonPress={() => dispatch(setPostShow(false))}
-            isVisible={postVisible}
-            style={{ margin: 0 }}
-        >
-            <ScrollView
-                style={{ flex: 1 }}
-                contentContainerStyle={{ flexGrow: 1 }}
-            >
-                <View /*style={styles.modalContent}*/>
-                    <View style={{ height: 70 }} />
-                    <View style={{ backgroundColor: "white", flex: 1 }}>
-                        <View
-                            style={{
-                                paddingHorizontal: 20,
-                                marginTop: 20,
-                                flex: 1,
-                            }}
-                        >
-                            <TextInput
-                                value={description}
-                                onChangeText={setDescription}
-                                style={{
-                                    color: "black",
-                                    fontSize: 19,
-                                    paddingTop: 16,
-                                    flex: 1,
-                                    textAlignVertical: "top",
-                                }}
-                                placeholder="What do you want to talk about?"
-                                multiline={true}
-                            />
-                        </View>
-                    </View>
-                </View>
-            </ScrollView>
-            {mediaFiles.length > 0 && (
-                <View style={{ backgroundColor: Colors.white }}>
-                    <FlatList
-                        data={mediaFiles}
-                        renderItem={({ item }) => (
-                            <MedifafileView item={item} />
-                        )}
-                        keyExtractor={(_, index) => index.toString()}
-                        horizontal={true}
-                        showsHorizontalScrollIndicator={false}
-                    />
-                </View>
-            )}
-            <View style={{ height: 65 }} />
+      <View style={{ flex: 1 }}>
+        {item.type === 'video/mp4' ? (
+          <View
+            style={{
+              height: 230,
+              backgroundColor: 'gray',
+              width: screenWidth,
+            }}>
+            <VideoPlayer
+              controls={true}
+              disableFullscreen={true}
+              disableBack={true}
+              source={{ uri: item.uri }}
+              style={{ width: '100%', height: '100%' }}
+              paused={true}
+            />
+          </View>
+        ) : (
+          <Image
+            style={{
+              height: 120,
+              width: 160,
+              borderRadius: 3,
+              margin: 5,
+            }}
+            source={{ uri: item.uri }}
+          />
+        )}
 
-            <View /*style={styles.topview}*/>
-                <View style={{ margin: 20, flexDirection: "row" }}>
-                    <TouchableOpacity
-                        onPress={toggleModal}
-                        style={{ marginTop: 3 }}
-                    >
-                        <Icon type={Icons.AntDesign} name="close" />
-                    </TouchableOpacity>
-                    <Image
-                        source={
-                            user.profileImagePath === ""
-                                ? require("../assets/images/Spiderman.jpg")
-                                : { uri: user.profileImagePath }
-                        }
-                        style={{
-                            height: 40,
-                            width: 40,
-                            borderRadius: 35,
-                            marginHorizontal: 20,
-                        }}
-                    />
-                    <View
-                        style={{
-                            marginTop: 3,
-                            marginLeft: "auto",
-                            flexDirection: "row",
-                        }}
-                    >
-                        <TouchableOpacity
-                            style={{ marginTop: 5 }}
-                            onPress={() => {
-                                console.log(mediaFiles);
-                            }}
-                        >
-                            <Icon type={Icons.Feather} name="clock" />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={postStatus}
-                            style={{ marginLeft: 20 }}
-                        >
-                            <View
-                                style={{
-                                    backgroundColor: "#0085f1",
-                                    paddingHorizontal: 15,
-                                    paddingVertical: 5,
-                                    borderRadius: 15,
-                                }}
-                            >
-                                <Text
-                                    style={{
-                                        fontSize: 16,
-                                        color: "white",
-                                        fontWeight: "bold",
-                                    }}
-                                >
-                                    Post
-                                </Text>
-                            </View>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </View>
-
-            <View
-                style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    backgroundColor: Colors.white,
-                }}
-            >
-                <View style={{ flexDirection: "row", padding: 20 }}>
-                    <TouchableOpacity onPress={takePhotoFromCamera}>
-                        <Icon type={Icons.Entypo} name="camera" size={25} />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={selectVideo}>
-                        <Icon
-                            type={Icons.Ionicons}
-                            name="ios-videocam"
-                            size={25}
-                            style={{ marginLeft: 20 }}
-                        />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        onPress={choosePhotoFromLibrary}
-                        style={{ marginLeft: 20 }}
-                    >
-                        <Icon type={Icons.FontAwesome} name="photo" size={25} />
-                    </TouchableOpacity>
-                    <View style={{ marginLeft: "auto" }}>
-                        <TouchableOpacity style={{ flexDirection: "row" }}>
-                            <Icon
-                                type={Icons.Ionicons}
-                                name="chatbox-ellipses"
-                                size={25}
-                            />
-                            <Text style={{ marginLeft: 10 }}>Anyone</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </View>
-        </Modal>
+        <View
+          style={{
+            position: 'absolute',
+            top: 5,
+            right: 5,
+            backgroundColor: Colors.white,
+            borderRadius: 50,
+          }}>
+          <TouchableOpacity
+            onPress={() =>
+              setMediaFiles(mediaFiles.filter((i) => i.uri != item.uri))
+            }>
+            <Icon
+              type={Icons.AntDesign}
+              name="closecircle"
+              color={Colors.darkOverlayColor}
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
     );
+  };
+
+  return (
+    <Modal
+      onBackdropPress={() => dispatch(setPostShow(false))}
+      onBackButtonPress={() => dispatch(setPostShow(false))}
+      isVisible={postVisible}
+      style={{ margin: 0 }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={styles.modalContent}>
+          <View style={{ height: 70 }} />
+          <View style={{ backgroundColor: 'white', flex: 1 }}>
+            <View
+              style={{
+                paddingHorizontal: 20,
+                marginTop: 20,
+                flex: 1,
+              }}>
+              <TextInput
+                value={description}
+                onChangeText={setDescription}
+                style={{
+                  color: 'black',
+                  fontSize: 19,
+                  paddingTop: 16,
+                  flex: 1,
+                  textAlignVertical: 'top',
+                }}
+                placeholder="What do you want to talk about?"
+                multiline={true}
+              />
+            </View>
+          </View>
+        </View>
+      </ScrollView>
+      {mediaFiles.length > 0 && (
+        <View style={{ backgroundColor: Colors.white }}>
+          <FlatList
+            data={mediaFiles}
+            renderItem={({ item }) => <MedifafileView item={item} />}
+            keyExtractor={(_, index) => index.toString()}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+          />
+        </View>
+      )}
+      <View style={{ height: 65 }} />
+
+      <View style={styles.topView}>
+        <View
+          style={{
+            margin: 20,
+            flexDirection: 'row',
+          }}>
+          <TouchableOpacity onPress={toggleModal} style={{ marginTop: 3 }}>
+            <Icon type={Icons.AntDesign} name="close" />
+          </TouchableOpacity>
+          <Image
+            source={
+              user.profileImagePath === ''
+                ? require('../assets/images/Spiderman.jpg')
+                : { uri: user.profileImagePath }
+            }
+            style={{
+              height: 40,
+              width: 40,
+              borderRadius: 35,
+              marginHorizontal: 20,
+            }}
+          />
+          <View
+            style={{
+              marginTop: 3,
+              marginLeft: 'auto',
+              flexDirection: 'row',
+            }}>
+            <TouchableOpacity
+              style={{ marginTop: 5 }}
+              onPress={() => {
+                console.log(mediaFiles);
+              }}>
+              <Icon type={Icons.Feather} name="clock" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={postStatus} style={{ marginLeft: 20 }}>
+              <View
+                style={{
+                  backgroundColor: '#0085f1',
+                  paddingHorizontal: 15,
+                  paddingVertical: 5,
+                  borderRadius: 15,
+                }}>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: 'white',
+                    fontWeight: 'bold',
+                  }}>
+                  Post
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+
+      <View
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: Colors.white,
+        }}>
+        <View style={{ flexDirection: 'row', padding: 20 }}>
+          <TouchableOpacity onPress={takePhotoFromCamera}>
+            <Icon type={Icons.Entypo} name="camera" size={25} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={selectVideo}>
+            <Icon
+              type={Icons.Ionicons}
+              name="ios-videocam"
+              size={25}
+              style={{ marginLeft: 20 }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={choosePhotoFromLibrary}
+            style={{ marginLeft: 20 }}>
+            <Icon type={Icons.FontAwesome} name="photo" size={25} />
+          </TouchableOpacity>
+          <View style={{ marginLeft: 'auto' }}>
+            <TouchableOpacity style={{ flexDirection: 'row' }}>
+              <Icon
+                type={Icons.Ionicons}
+                name="chatbox-ellipses"
+                size={25}
+              />
+              <Text style={{ marginLeft: 10 }}>Anyone</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
 }
+
 export default PostScreen;
+
+const styles = StyleSheet.create({
+  modalContent: {
+    backgroundColor: '#fff',
+    flex: 1,
+  },
+  topView: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'white',
+    elevation: 5,
+  },
+});
