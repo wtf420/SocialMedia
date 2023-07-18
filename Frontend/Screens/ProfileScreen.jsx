@@ -70,10 +70,10 @@ function ProfileScreen({ navigation }) {
 
     const postImage = (image) => {
         const dataForm = new FormData();
-        dataForm.append("profile-image", {
-            uri: image.path,
+        dataForm.append("image", {
+            uri: image.uri,
             type: "image/png",
-            name: image.filename || "profile-image",
+            name: uuidv4() + "_pf-image",
         });
         dispatch(setStatus(true));
         postAvatarImg(dataForm, uid, token)

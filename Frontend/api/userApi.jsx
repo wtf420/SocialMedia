@@ -55,14 +55,15 @@ export const getInfoUser = async (data) => {
     }
 };
 
-export const postAvatarImg = async (dataForm, userId, token) => {
+export const postAvatarImg = async (data, userId, token) => {
     try {
         const result = await ApiManager(`/${userId}/profile-image`, {
-            method: "POST",
+            method: "post",
             headers: {
                 Authorization: "Bearer " + token,
+                "Content-Type": "multipart/form-data",
             },
-            body: dataForm,
+            data: data,
         });
         return result;
     } catch (error) {

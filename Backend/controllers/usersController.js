@@ -1,22 +1,6 @@
 const User = require('../models/User')
 const asyncCatch = require('../utils/asyncCatch')
 const AppError = require('../utils/AppError')
-const s3Controller = require('./s3Controller')
-
-exports.updateProfileImage = asyncCatch(async (req, res, next) => {
-    if (!req.file || !req.file.location)
-        return next(new AppError('Unable to upload profile image', 500))
-
-    const { userId } = req.params
-    const user = await User.findById(userId)
-    if (user.profileImagePath)
-        s3Controller.deleteMediaFile(user.profileImagePath)
-
-    user.profileImagePath = req.file.location
-    await user.save()
-
-    res.status(200).json({ imagePath: req.file.location })
-})
 
 exports.getUserById = asyncCatch(async (req, res, next) => {
     const { userId } = req.params
