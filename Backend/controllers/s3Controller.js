@@ -6,6 +6,7 @@ const StatusPost = require('../models/StatusPost')
 const s3Controller = require('./s3Controller')
 const socketIO = require('../socket/socket')
 const Notification = require('../models/Notification')
+const Story = require('../models/Story')
 
 var serviceAccount = require('../social-media-620ea-firebase-adminsdk-76t2t-2acb9784e9.json')
 admin.initializeApp({
@@ -16,6 +17,91 @@ admin.initializeApp({
 const bucket = admin.storage().bucket()
 
 exports.uploadMediaFiles = asyncCatch(async (req, res, next) => {})
+
+exports.uploadStoryFiles = asyncCatch(async (req, res, next) => {
+    const { userId } = req.params
+    const mediaFiles = []
+    console.log('request received')
+    console.log(req.files)
+
+    if (req.files) {
+        const promises = req.files.map(async (file) => {
+            const filename = file.originalname
+            const blob = bucket.file(filename)
+            const downloadTokens = uuidv4()
+
+            const blobStream = blob.createWriteStream({
+                metadata: {
+                    contentType: file.mimetype,
+                    metadata: {
+                        firebaseStorageDownloadTokens: downloadTokens,
+                    },
+                },
+            })
+
+            return new Promise((resolve, reject) => {
+                blobStream.on('error', (err) => {
+                    console.error('Error uploading image to Firebase:', err)
+                    reject(err)
+                })
+
+                blobStream.on('finish', async () => {
+                    // Make the image file publicly accessible
+                    await blob.makePublic()
+
+                    const downloadUrl = await blob.getSignedUrl({
+                        action: 'read',
+                        expires: '03-01-2500', // Set an appropriate expiration date
+                    })
+
+                    let fileType
+                    if (file.mimetype.startsWith('image/')) fileType = 'Image'
+                    else if (file.mimetype.startsWith('video/'))
+                        fileType = 'Video'
+
+                    const newFile = {
+                        location: downloadUrl[0],
+                        name: file.originalname,
+                        fileType: fileType,
+                    }
+
+                    resolve(newFile)
+                })
+
+                blobStream.end(file.buffer)
+            })
+        })
+
+        try {
+            const uploadedFiles = await Promise.all(promises)
+            mediaFiles.push(...uploadedFiles)
+        } catch (err) {
+            return res.status(500).json({ error: 'Failed to upload image' })
+        }
+    }
+
+    const newStory = await Story.create({
+        author: userId,
+        mediaFiles: mediaFiles,
+    })
+
+    if (!newStory) {
+        if (req.files)
+            req.files.forEach((item) =>
+                s3Controller.deleteMediaFile(item.location)
+            )
+        return next(new AppError('Unable to create new story', 500))
+    }
+
+    const populatedStory = await newStory.populate(
+        'author',
+        '_id name profileImagePath followers'
+    )
+
+    sendNotificationOnPostingStory(populatedStory._id, populatedStory.author)
+
+    res.status(200).json(populatedStory)
+})
 
 exports.uploadPostFiles = asyncCatch(async (req, res, next) => {
     const { userId } = req.params
@@ -85,12 +171,11 @@ exports.uploadPostFiles = asyncCatch(async (req, res, next) => {
     })
 
     if (!newStatusPost) {
-        // if (req.files)
-        //     req.files.forEach((item) =>
-        //         s3Controller.deleteMediaFile(item.location)
-        //     )
-        // return next(new AppError('Unable to create new status post', 500))
-        console.log('ded')
+        if (req.files)
+            req.files.forEach((item) =>
+                s3Controller.deleteMediaFile(item.location)
+            )
+        return next(new AppError('Unable to create new status post', 500))
     }
 
     // why populated is not the response for res.json is because it was in the old version and i hate to change it
@@ -270,5 +355,29 @@ const sendNotificationOnPosting = async (statusPostId, statusPostAuthor) => {
             isRead: false,
             link: statusPostId,
         })
+    })
+}
+
+const sendNotificationOnPostingStory = async (storyId, storyAuthor) => {
+    storyAuthor.followers.forEach(async (followerId) => {
+        const noti = await Notification.create({
+            userId: followerId.toString(),
+            sender: storyAuthor._id,
+            notificationType: 'NewStory', // todo: there is no time for other type, should be changed in future
+            content: `${storyAuthor.name} has posted a new story`,
+            isRead: false,
+            link: storyId,
+        })
+
+        const notiObject = noti.toObject()
+        notiObject.sender = {
+            _id: storyAuthor._id,
+            name: storyAuthor.name,
+            profileImagePath: storyAuthor.profileImagePath,
+        }
+
+        const io = socketIO.getIO()
+        if (noti)
+            io.in(followerId.toString()).emit('newNotification', notiObject)
     })
 }

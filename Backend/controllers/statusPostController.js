@@ -139,8 +139,10 @@ exports.getNewsFeed = asyncCatch(async (req, res, next) => {
     const { page } = req.query
     const user = await User.findById(userId)
 
-    const newsFeed = await StatusPost.find({ user: { $in: user.followings } })
-        .sort({ createdAt: -1 }) // Sort by descending createdAt
+    const newsFeed = await StatusPost.find({
+        author: { $in: user.followings },
+    })
+        .sort('-createdAt') // Sort by descending createdAt
         .skip(page * 7)
         .limit(7)
         .populate('author', '_id name profileImagePath workingPlace')

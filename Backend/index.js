@@ -20,6 +20,7 @@ const chatRouter = require('./routes/chatRoutes')
 const statusPostRouter = require('./routes/statusPostRoutes')
 const statusCommentRouter = require('./routes/statusCommentRoutes')
 const storyRouter = require('./routes/storyRoutes')
+const bodyParser = require('body-parser')
 
 const app = express()
 const server = http.createServer(app)
@@ -34,6 +35,12 @@ app.use(
         extended: true,
     })
 )
+
+// Increase payload size limit for JSON requests
+app.use(bodyParser.json({ limit: '50mb' }))
+
+// Increase payload size limit for form data requests
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }))
 
 app.use('', authRouter)
 app.post('/email-search', stringSearchController.searchByEmail)

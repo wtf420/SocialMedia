@@ -44,6 +44,8 @@ export const getStoryFeed = async (userId, token) => {
 
 export const createStory = async (data, userId, token) => {
     try {
+        console.log("create Story api:");
+        console.log(data);
         const result = await ApiManager(`/${userId}/story`, {
             method: "POST",
             headers: {

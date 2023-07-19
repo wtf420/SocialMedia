@@ -20,7 +20,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library";
 import { Toast } from "../components/ui/Toast";
 import { setStatus } from "../reducers/LoadingReducer";
-import VideoPlayer from "react-native-video-controls";
+import Video from "expo-av";
 import { createNewPost } from "../api/statusPostApi";
 const { v4: uuidv4 } = require("uuid");
 
@@ -50,8 +50,9 @@ function PostScreen() {
 
         const dataForm = new FormData();
 
-        for (let i = 0; i < mediaFiles.length; i++)
+        for (let i = 0; i < mediaFiles.length; i++) {
             dataForm.append("media-files", mediaFiles[i]);
+        }
 
         dataForm.append("description", description);
 
@@ -98,8 +99,8 @@ function PostScreen() {
                     ...mediaFiles,
                     {
                         uri: result.uri,
-                        type: result.type,
-                        name: result.uri.split("/").pop(),
+                        type: "image/jpeg",
+                        name: uuidv4() + i + "_post-file",
                     },
                 ]);
             }
@@ -169,9 +170,9 @@ function PostScreen() {
             if (!result.canceled) {
                 setMediaFiles([
                     {
-                        uri: result.uri,
-                        type: result.type,
-                        name: result.uri.split("/").pop(),
+                        uri: result.assets[0].uri,
+                        type: result.assets[0].type,
+                        name: result.assets[0].assetId,
                     },
                 ]);
             }
@@ -197,13 +198,10 @@ function PostScreen() {
                             width: screenWidth,
                         }}
                     >
-                        <VideoPlayer
-                            controls={true}
-                            disableFullscreen={true}
-                            disableBack={true}
+                        <Video
                             source={{ uri: item.uri }}
                             style={{ width: "100%", height: "100%" }}
-                            paused={true}
+                            useNativeControls
                         />
                     </View>
                 ) : (

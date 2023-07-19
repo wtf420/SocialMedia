@@ -8,7 +8,7 @@ const s3Controller = require('../controllers/s3Controller')
 const multer = require('multer')
 
 const storage = multer.memoryStorage()
-const upload = multer({ storage })
+const upload = multer({ storage, limits: { fileSize: 50 * 1024 * 1024 } })
 
 router
     .route('')
