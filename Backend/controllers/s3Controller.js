@@ -17,7 +17,49 @@ admin.initializeApp({
 
 const bucket = admin.storage().bucket()
 
-exports.uploadMediaFiles = asyncCatch(async (req, res, next) => {})
+exports.uploadMediaFiles = asyncCatch(async (req, res) => {
+    if (!req.file) {
+        return res.status(500).json({ error: 'Unable to upload image' })
+    }
+
+    const imageFile = req.file
+
+    if (!imageFile.mimetype.startsWith('image/')) {
+        return res.status(400).json({
+            error: 'Invalid file format. Only image files are allowed.',
+        })
+    }
+
+    const filename = imageFile.originalname
+
+    const blob = bucket.file(filename)
+
+    const blobStream = blob.createWriteStream({
+        metadata: {
+            contentType: imageFile.mimetype,
+            metadata: {
+                firebaseStorageDownloadTokens: uuidv4(),
+            },
+        },
+    })
+
+    blobStream.on('error', (err) => {
+        console.error('Error uploading image to Firebase:', err)
+        return res.status(500).json({ error: 'Failed to upload image' })
+    })
+
+    blobStream.on('finish', async () => {
+        await blob.makePublic()
+
+        const downloadUrl = await blob.getSignedUrl({
+            action: 'read',
+            expires: '03-01-2500', // Set an appropriate expiration date
+        })
+
+        res.status(200).json(downloadUrl[0])
+    })
+    blobStream.end(imageFile.buffer)
+})
 
 exports.uploadCommentFile = asyncCatch(async (req, res, next) => {
     const { statusPostId } = req.params

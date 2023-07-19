@@ -21,6 +21,8 @@ const statusPostRouter = require('./routes/statusPostRoutes')
 const statusCommentRouter = require('./routes/statusCommentRoutes')
 const storyRouter = require('./routes/storyRoutes')
 
+const multer = require('multer')
+
 const app = express()
 const server = http.createServer(app)
 
@@ -35,11 +37,18 @@ app.use(
     })
 )
 
+const storage = multer.memoryStorage()
+const upload = multer({ storage })
+
 app.use('', authRouter)
 app.post('/email-search', stringSearchController.searchByEmail)
 app.post('/name-search', stringSearchController.searchByName)
 app.use('/chatroom', chatRouter)
-app.post('/upload-image', s3Controller.uploadMediaFiles)
+app.post(
+    '/upload-image',
+    upload.single('media-file'),
+    s3Controller.uploadMediaFiles
+)
 app.use('/s/:statusPostId/comment', statusCommentRouter)
 app.get('/s/:statusPostId', statusPostController.getStatusPostById)
 app.get('/story/:storyId', storyController.getStoryById)

@@ -91,7 +91,7 @@ function PostScreen() {
 
             const result = await ImagePicker.launchCameraAsync({
                 allowsEditing: false,
-                quality: 0.8,
+                quality: 1,
             });
 
             if (!result.canceled) {

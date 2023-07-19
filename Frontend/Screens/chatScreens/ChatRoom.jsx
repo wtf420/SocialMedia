@@ -21,6 +21,7 @@ import { Toast } from "../../components/ui/Toast";
 import { emitEvent, subscribeToEvent } from "../../utils/socket";
 import { setCallShow, setDataCall } from "../../reducers/UtilsReducer";
 import { UploadImage } from "../../api/Utils";
+const { v4: uuidv4 } = require("uuid");
 
 class Message {
     constructor(id, message, imageLink, senderId, createdAt) {
@@ -67,20 +68,25 @@ const ChatRoom = ({ navigation, route }) => {
         };
     }, []);
 
-    const takePhotoFromCamera = () => {
-        ImagePicker.openCamera({
-            // height: 140,
-            // width: 140,
-            // cropperCircleOverlay: true,
-        })
-            .then((image) => {
-                setMediaFile({
-                    uri: image.path,
-                    type: image.mime,
-                    name: image.path.split("/").pop(),
-                });
-            })
-            .catch((error) => Toast(error.message));
+    const takePhotoFromCamera = async () => {
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== "granted") {
+            Toast("Permission to access camera denied");
+            return;
+        }
+
+        const result = await ImagePicker.launchCameraAsync({
+            allowsEditing: false,
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            setMediaFile({
+                uri: result.uri,
+                type: "image/jpeg",
+                name: uuidv4() + "_post-file",
+            });
+        }
     };
 
     const choosePhotoFromLibrary = async () => {
@@ -98,15 +104,14 @@ const ChatRoom = ({ navigation, route }) => {
             const result = await ImagePicker.launchImageLibraryAsync({
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
                 allowsEditing: true,
-                aspect: [4, 3],
-                quality: 0.8,
+                quality: 1,
             });
 
             if (!result.canceled) {
                 setMediaFile({
                     uri: result.uri,
                     type: "image/jpeg", // or result.type
-                    name: "photo.jpg", // or result.name
+                    name: uuidv4() + "_post-file", // or result.name
                 });
             }
         } catch (error) {
