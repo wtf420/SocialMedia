@@ -48,8 +48,7 @@ export default function PostStoryScreen({ navigation }) {
             const result = await ImagePicker.launchImageLibraryAsync({
                 mediaTypes: ImagePicker.MediaTypeOptions.All,
                 allowsEditing: true,
-                aspect: [4, 3],
-                quality: 0.8,
+                quality: 1,
                 maxFiles: 10,
             });
 
