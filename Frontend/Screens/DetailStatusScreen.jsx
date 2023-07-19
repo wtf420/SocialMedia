@@ -162,7 +162,7 @@ export default function DetailStatusScreen({ route }) {
             });
 
             if (!result.canceled) {
-                setMediaFile(result);
+                setMediaFile(result.assets[0]);
             }
         } catch (error) {
             Toast(error.message);

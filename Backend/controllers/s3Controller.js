@@ -7,6 +7,7 @@ const s3Controller = require('./s3Controller')
 const socketIO = require('../socket/socket')
 const Notification = require('../models/Notification')
 const Story = require('../models/Story')
+const StatusComment = require('../models/StatusComment')
 
 var serviceAccount = require('../social-media-620ea-firebase-adminsdk-76t2t-2acb9784e9.json')
 admin.initializeApp({
@@ -17,6 +18,82 @@ admin.initializeApp({
 const bucket = admin.storage().bucket()
 
 exports.uploadMediaFiles = asyncCatch(async (req, res, next) => {})
+
+exports.uploadCommentFile = asyncCatch(async (req, res, next) => {
+    const { statusPostId } = req.params
+    const { content, userId } = req.body
+
+    const statusPost = await StatusPost.findById(statusPostId)
+    if (!statusPost)
+        return next(new AppError('Unable to find status post', 404))
+
+    let fileUrl
+    if (req.file) {
+        const commentFile = req.file
+        const filename = commentFile.originalname
+        const blob = bucket.file(filename)
+
+        const uploadComplete = new Promise((resolve, reject) => {
+            const blobStream = blob.createWriteStream({
+                metadata: {
+                    contentType: commentFile.mimetype,
+                    metadata: {
+                        firebaseStorageDownloadTokens: uuidv4(),
+                    },
+                },
+            })
+
+            blobStream.on('error', (err) => {
+                console.error('Error uploading image to Firebase:', err)
+                reject(err)
+            })
+
+            blobStream.on('finish', async () => {
+                try {
+                    await blob.makePublic()
+                    const downloadUrl = await blob.getSignedUrl({
+                        action: 'read',
+                        expires: '03-01-2500', // Set an appropriate expiration date
+                    })
+                    fileUrl = downloadUrl[0]
+                    resolve()
+                } catch (error) {
+                    reject(error)
+                }
+            })
+
+            blobStream.end(commentFile.buffer)
+        })
+
+        await uploadComplete.catch((error) => {
+            console.error('Error uploading image to Firebase:', error)
+            return res.status(500).json({ error: 'Failed to upload image' })
+        })
+    }
+
+    const newComment = await StatusComment.create({
+        author: userId,
+        statusPostId: statusPostId,
+        content: content,
+        mediaFile: fileUrl ? fileUrl : null,
+    })
+
+    if (!newComment) {
+        next(new AppError('Unable to create comment', 500))
+        s3Controller.deleteMediaFile(req.file.location)
+        return
+    }
+
+    statusPost.commentCount += 1
+    statusPost.save()
+
+    sendNotificationOnSomeoneComment(statusPostId, userId)
+    await newComment.populate(
+        'author',
+        '_id name profileImagePath email workingPlace'
+    )
+    res.status(200).json(newComment)
+})
 
 exports.uploadStoryFiles = asyncCatch(async (req, res, next) => {
     const { userId } = req.params
@@ -380,4 +457,35 @@ const sendNotificationOnPostingStory = async (storyId, storyAuthor) => {
         if (noti)
             io.in(followerId.toString()).emit('newNotification', notiObject)
     })
+}
+
+const sendNotificationOnSomeoneComment = async (
+    statusPostId,
+    commentAuthorId
+) => {
+    const statusPost = await StatusPost.findById(statusPostId)
+    const commentor = await User.findById(commentAuthorId)
+    if (statusPost.author.toString() === commentAuthorId) return
+
+    const noti = await Notification.create({
+        userId: statusPost.author,
+        sender: commentor._id,
+        notificationType: 'Comment',
+        content: `${commentor.name} has commented about your status`,
+        isRead: false,
+        link: statusPostId,
+    })
+
+    const notiObject = noti.toObject()
+    notiObject.sender = {
+        _id: commentor._id,
+        name: commentor.name,
+        profileImagePath: commentor.profileImagePath,
+    }
+
+    console.log(JSON.stringify(notiObject))
+
+    const io = socketIO.getIO()
+    if (noti)
+        io.in(statusPost.author.toString()).emit('newNotification', notiObject)
 }

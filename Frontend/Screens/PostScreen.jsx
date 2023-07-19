@@ -100,7 +100,7 @@ function PostScreen() {
                     {
                         uri: result.uri,
                         type: "image/jpeg",
-                        name: uuidv4() + i + "_post-file",
+                        name: uuidv4() + "_post-file",
                     },
                 ]);
             }

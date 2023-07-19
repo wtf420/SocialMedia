@@ -46,19 +46,24 @@ export const getNewsFeed = async (userId, token, pageNum) => {
 };
 
 export const createNewPost = async (dataForm, userId, token) => {
-    const result = await ApiManager(`/${userId}/post`, {
-        method: "POST",
-        headers: {
-            Authorization: "Bearer " + token,
-            "Content-Type": "multipart/form-data",
-        },
-        data: dataForm,
-        maxContentLength: Infinity, // Allow large file uploads
-        maxBodyLength: Infinity,
-    });
-    console.log("result here");
-    console.log(result);
-    return result;
+    try {
+        const result = await ApiManager(`/${userId}/post`, {
+            method: "POST",
+            headers: {
+                Authorization: "Bearer " + token,
+                "Content-Type": "multipart/form-data",
+            },
+            data: dataForm,
+            maxContentLength: Infinity, // Allow large file uploads
+            maxBodyLength: Infinity,
+        });
+
+        console.log("result here");
+        console.log(result);
+        return result;
+    } catch (error) {
+        console.log(error);
+    }
 };
 
 export const updateStatusPostApi = async (data, userId, token, statusPost) => {

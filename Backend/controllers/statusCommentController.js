@@ -23,36 +23,6 @@ const getUserIdFromJWT = (req, next) => {
     return tokenData.id
 }
 
-const sendNotificationOnSomeoneComment = async (
-    statusPostId,
-    commentAuthorId
-) => {
-    const statusPost = await StatusPost.findById(statusPostId)
-    const commentor = await User.findById(commentAuthorId)
-    if (statusPost.author.toString() === commentAuthorId) return
-
-    const noti = await Notification.create({
-        userId: statusPost.author,
-        sender: commentor._id,
-        notificationType: 'Comment',
-        content: `${commentor.name} has commented about your status`,
-        isRead: false,
-        link: statusPostId,
-    })
-
-    const notiObject = noti.toObject()
-    notiObject.sender = {
-        _id: commentor._id,
-        name: commentor.name,
-        profileImagePath: commentor.profileImagePath,
-    }
-
-    console.log(JSON.stringify(notiObject))
-
-    const io = socketIO.getIO()
-    if (noti) io.in(statusPost.author.toString()).emit('newNotification', notiObject)
-}
-
 // exports.getCommentById = asyncCatch(async (req, res, next) => {
 //     const { commentId } = req.params
 //     const comment = await StatusComment.findById(commentId).populate(
@@ -69,39 +39,6 @@ const sendNotificationOnSomeoneComment = async (
 
 //     res.status(200).json(comment)
 // })
-
-exports.createNewComment = asyncCatch(async (req, res, next) => {
-    const { statusPostId } = req.params
-    const { content, userId } = req.body
-
-    const statusPost = await StatusPost.findById(statusPostId)
-    if (!statusPost)
-        return next(new AppError('Unable to find status post', 404))
-
-    const newComment = await StatusComment.create({
-        author: userId,
-        statusPostId: statusPostId,
-        content: content,
-        mediaFile: req.file ? req.file.location : null,
-    })
-
-    if (!newComment) {
-        next(new AppError('Unable to create comment', 500))
-        s3Controller.deleteMediaFile(req.file.location)
-        return
-    }
-
-    // update the comment count of status post
-    statusPost.commentCount += 1
-    statusPost.save()
-
-    sendNotificationOnSomeoneComment(statusPostId, userId)
-    await newComment.populate(
-        'author',
-        '_id name profileImagePath email workingPlace'
-    )
-    res.status(200).json(newComment)
-})
 
 exports.deleteComment = asyncCatch(async (req, res, next) => {
     const { commentId, statusPostId } = req.params
