@@ -206,8 +206,8 @@ function PostScreen() {
             // Lấy địa chỉ địa lý từ thông tin vị trí
             const { latitude, longitude } = location.coords;
             const newAddress = await Location.reverseGeocodeAsync({
-                newlatitude,
-                newlongitude,
+                latitude,
+                longitude,
             });
 
             // Chuyển đổi thông tin địa chỉ thành một chuỗi hiển thị dễ đọc
