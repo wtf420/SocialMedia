@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
         flex: 1,
         marginHorizontal: 10,
         height: 40,
-        backgroundColor: Colors.skyBlue,
+        backgroundColor: Colors.gray,
         borderRadius: 5,
         paddingHorizontal: 10,
         color: Colors.black,
