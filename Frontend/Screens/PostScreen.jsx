@@ -23,6 +23,7 @@ import { setStatus } from "../reducers/LoadingReducer";
 import Video from "expo-av";
 import { createNewPost } from "../api/statusPostApi";
 import * as Location from "expo-location";
+import { add } from "react-native-reanimated";
 const { v4: uuidv4 } = require("uuid");
 
 function PostScreen() {
@@ -35,8 +36,8 @@ function PostScreen() {
     const uid = useSelector((state) => state.uid.id);
 
     const [location, setLocation] = useState(null);
-    const [address, setAddress] = useState(null);
-
+    const [showLocation, setShowLocation] = useState(false);
+    const [getLocation, changeCurrentLocation] = useState(false);
     const dispatch = useDispatch();
 
     const toggleModal = () => {
@@ -190,61 +191,53 @@ function PostScreen() {
         setMediaFiles([]);
     }, [postVisible]);
 
-    const postLocation = async () => {
-        try {
-            // Kiểm tra quyền truy cập vị trí của người dùng
-            const { status } =
-                await Location.requestForegroundPermissionsAsync();
-            if (status !== "granted") {
-                Toast("Permission to access location denied");
-                return;
-            }
-
-            // Lấy thông tin vị trí hiện tại của người dùng
-            const location = await Location.getCurrentPositionAsync({});
-
-            // Lấy địa chỉ địa lý từ thông tin vị trí
-            const { latitude, longitude } = location.coords;
-            const newAddress = await Location.reverseGeocodeAsync({
-                latitude,
-                longitude,
-            });
-
-            // Chuyển đổi thông tin địa chỉ thành một chuỗi hiển thị dễ đọc
-            const formattedAddress = `${newAddress[0].name}, ${newAddress[0].streetNumber}, ${newAddress[0].street}, ${newAddress[0].district}, ${newAddress[0].city}, ${newAddress[0].subregion}, ${newAddress[0].region}, ${newAddress[0].country}`;
-
-            // Cập nhật state selectedLocation với địa chỉ địa lý đã chọn
-            setLocation(formattedAddress);
-
-            // Hiển thị thông báo hoặc thực hiện các xử lý khác liên quan khi thành công
-            console.log("latitude: " + latitude + ", longitude: " + longitude);
-            console.log("Location selected: " + formattedAddress);
-        } catch (error) {
-            // Xử lý lỗi nếu có
-            console.error("Error fetching location:", error);
-            Toast("Error fetching location");
-        }
+    const toggleLocation = () => {
+        setShowLocation(!showLocation);
     };
 
-    useEffect(() => {
-        (async () => {
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== "granted") {
-                console.log("Permission to access location was denied.");
-                return;
+    const postLocation = async () => {
+        if (!showLocation) {
+            try {
+                // Kiểm tra quyền truy cập vị trí của người dùng
+                const { status } =
+                    await Location.requestForegroundPermissionsAsync();
+                if (status !== "granted") {
+                    Toast("Permission to access location denied");
+                    return;
+                }
+
+                // Lấy thông tin vị trí hiện tại của người dùng
+                const location = await Location.getCurrentPositionAsync({});
+
+                // Lấy địa chỉ địa lý từ thông tin vị trí
+                const { latitude, longitude } = location.coords;
+                const newAddress = await Location.reverseGeocodeAsync({
+                    latitude,
+                    longitude,
+                });
+
+                // Chuyển đổi thông tin địa chỉ thành một chuỗi hiển thị dễ đọc
+                const formattedAddress =
+                    (newAddress[0].name ? newAddress[0].name + ", " : "") +
+                    (newAddress[0].street ? newAddress[0].street + ", " : "") +
+                    (newAddress[0].city ? newAddress[0].city + ", " : "") +
+                    (newAddress[0].region ? newAddress[0].region + ", " : "") +
+                    (newAddress[0].country ? newAddress[0].country : "");
+
+                // Cập nhật state selectedLocation với địa chỉ địa lý đã chọn
+                changeCurrentLocation("Đang ở " + formattedAddress);
+                setLocation(location);
+            } catch (error) {
+                // Xử lý lỗi nếu có
+                console.error("Error fetching location:", error);
+                Toast("Error fetching location");
             }
-
-            let location = await Location.getCurrentPositionAsync({});
-            setLocation(location);
-
-            let addressData = await Location.reverseGeocodeAsync({
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
-            });
-
-            setAddress(addressData[0]);
-        })();
-    }, []);
+        } else {
+            changeCurrentLocation(null);
+        }
+        toggleLocation();
+        return getLocation;
+    };
 
     const MedifafileView = ({ item }) => {
         const screenWidth = Dimensions.get("window").width;
@@ -324,6 +317,7 @@ function PostScreen() {
                                 flex: 1,
                             }}
                         >
+                            <Text>{getLocation}</Text>
                             <TextInput
                                 value={description}
                                 onChangeText={setDescription}
@@ -393,7 +387,7 @@ function PostScreen() {
                             style={{ marginTop: 5 }}
                             onPress={() => postLocation()}
                         >
-                            <Icon type={Icons.Feather} name="clock" />
+                            <Icon type={Icons.Feather} name="map-pin" />
                         </TouchableOpacity>
 
                         <TouchableOpacity
