@@ -1,9 +1,13 @@
 import React from "react";
 import { View, Text, FlatList } from "react-native";
+import { useSelector } from "react-redux";
 import ShowPosts from "../components/ui/ShowPosts";
 import Header from "../components/ui/Header";
 
 export default function PostOfUserSreen({ navigation, route }) {
+    const StatusData = useSelector((state) => state.statusPost.sub);
+    const { userId } = route.params;
+
     return (
         <View style={{ flex: 1 }}>
             <Header navigation={navigation} />
