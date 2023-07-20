@@ -22,6 +22,7 @@ import { Toast } from "../components/ui/Toast";
 import { setStatus } from "../reducers/LoadingReducer";
 import Video from "expo-av";
 import { createNewPost } from "../api/statusPostApi";
+import * as Location from "expo-location";
 const { v4: uuidv4 } = require("uuid");
 
 function PostScreen() {
@@ -32,6 +33,9 @@ function PostScreen() {
     const postVisible = useSelector((state) => state.Utils.postShow);
     const token = useSelector((state) => state.token.key);
     const uid = useSelector((state) => state.uid.id);
+
+    const [location, setLocation] = useState(null);
+    const [address, setAddress] = useState(null);
 
     const dispatch = useDispatch();
 
@@ -186,6 +190,62 @@ function PostScreen() {
         setMediaFiles([]);
     }, [postVisible]);
 
+    const postLocation = async () => {
+        try {
+            // Kiểm tra quyền truy cập vị trí của người dùng
+            const { status } =
+                await Location.requestForegroundPermissionsAsync();
+            if (status !== "granted") {
+                Toast("Permission to access location denied");
+                return;
+            }
+
+            // Lấy thông tin vị trí hiện tại của người dùng
+            const location = await Location.getCurrentPositionAsync({});
+
+            // Lấy địa chỉ địa lý từ thông tin vị trí
+            const { latitude, longitude } = location.coords;
+            const newAddress = await Location.reverseGeocodeAsync({
+                newlatitude,
+                newlongitude,
+            });
+
+            // Chuyển đổi thông tin địa chỉ thành một chuỗi hiển thị dễ đọc
+            const formattedAddress = `${newAddress[0].name}, ${newAddress[0].streetNumber}, ${newAddress[0].street}, ${newAddress[0].district}, ${newAddress[0].city}, ${newAddress[0].subregion}, ${newAddress[0].region}, ${newAddress[0].country}`;
+
+            // Cập nhật state selectedLocation với địa chỉ địa lý đã chọn
+            setLocation(formattedAddress);
+
+            // Hiển thị thông báo hoặc thực hiện các xử lý khác liên quan khi thành công
+            console.log("latitude: " + latitude + ", longitude: " + longitude);
+            console.log("Location selected: " + formattedAddress);
+        } catch (error) {
+            // Xử lý lỗi nếu có
+            console.error("Error fetching location:", error);
+            Toast("Error fetching location");
+        }
+    };
+
+    useEffect(() => {
+        (async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== "granted") {
+                console.log("Permission to access location was denied.");
+                return;
+            }
+
+            let location = await Location.getCurrentPositionAsync({});
+            setLocation(location);
+
+            let addressData = await Location.reverseGeocodeAsync({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+            });
+
+            setAddress(addressData[0]);
+        })();
+    }, []);
+
     const MedifafileView = ({ item }) => {
         const screenWidth = Dimensions.get("window").width;
         return (
@@ -331,12 +391,11 @@ function PostScreen() {
                     >
                         <TouchableOpacity
                             style={{ marginTop: 5 }}
-                            onPress={() => {
-                                console.log(mediaFiles);
-                            }}
+                            onPress={() => postLocation()}
                         >
                             <Icon type={Icons.Feather} name="clock" />
                         </TouchableOpacity>
+
                         <TouchableOpacity
                             onPress={postStatus}
                             style={{ marginLeft: 20 }}
