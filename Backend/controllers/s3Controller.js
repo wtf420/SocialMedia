@@ -10,6 +10,7 @@ const Story = require('../models/Story')
 const StatusComment = require('../models/StatusComment')
 
 var serviceAccount = require('../social-media-620ea-firebase-adminsdk-76t2t-2acb9784e9.json')
+const { readAllNotifications } = require('./notificationController')
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     storageBucket: 'social-media-620ea.appspot.com',
@@ -281,12 +282,23 @@ exports.uploadPostFiles = asyncCatch(async (req, res, next) => {
             return res.status(500).json({ error: 'Failed to upload image' })
         }
     }
+    let location = {
+        location: false,
+    }
+    if (req.body.location) {
+        location = {
+            location: true,
+            latitude: req.body.latitude,
+            longitude: req.body.longitude,
+        }
+    }
 
     const newStatusPost = await StatusPost.create({
         author: userId,
         description: req.body.description,
         mediaFiles: mediaFiles,
         sharedLink: req.body.sharedLink,
+        location: location,
     })
 
     if (!newStatusPost) {
@@ -312,7 +324,7 @@ exports.uploadPostFiles = asyncCatch(async (req, res, next) => {
         })
     })
 
-    res.status(200).json(newStatusPost)
+    res.status(200).json('newStatusPost')
 })
 
 exports.uploadBackgroundImage = asyncCatch(async (req, res, next) => {

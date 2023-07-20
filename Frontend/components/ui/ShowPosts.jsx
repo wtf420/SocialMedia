@@ -27,6 +27,7 @@ import {
 import { Video } from "expo-av";
 import { setShareLink, setShareShow } from "../../reducers/UtilsReducer";
 import PostShared from "./PostShared";
+import * as Location from "expo-location";
 
 export default function ShowPosts({
     item,
@@ -52,6 +53,28 @@ export default function ShowPosts({
     const timeAgo = getTimeToNow(item.createdAt);
     // check user like this post or not
     // like or unlike
+
+    const [getLocation, changeCurrentLocation] = useState(null);
+
+    const getLocationPlace = async () => {
+        if (item.location) {
+            const newAddress = await Location.reverseGeocodeAsync({
+                latitude: item.location.latitude,
+                longitude: item.location.longitude,
+            });
+
+            // Chuyển đổi thông tin địa chỉ thành một chuỗi hiển thị dễ đọc
+            const formattedAddress =
+                (newAddress[0].name ? newAddress[0].name + ", " : "") +
+                (newAddress[0].street ? newAddress[0].street + ", " : "") +
+                (newAddress[0].city ? newAddress[0].city + ", " : "") +
+                (newAddress[0].region ? newAddress[0].region + ", " : "") +
+                (newAddress[0].country ? newAddress[0].country : "");
+
+            changeCurrentLocation("Đăng tại " + formattedAddress);
+        }
+    };
+
     const handleLike = async () => {
         try {
             const response = await toggleLikeStatusApi(uid, jwt, item._id);
@@ -94,6 +117,8 @@ export default function ShowPosts({
             setPaused(true);
         }, 1500);
     }, []);
+
+    getLocationPlace();
 
     return (
         <View
@@ -169,6 +194,29 @@ export default function ShowPosts({
                     {/* time ago */}
                     <Text style={{ fontSize: 11 }}>{timeAgo}</Text>
                 </View>
+
+                {item.location ? (
+                    <View style={{ flex: 1, alignItems: "flex-end" }}>
+                        <Text
+                            numberOfLines={2}
+                            style={{
+                                paddingLeft: 15,
+                                color: Colors.black,
+                                fontStyle: "italic",
+                                color: "gray",
+                                textAlign: "justify",
+                                width: 200,
+                            }}
+                        >
+                            <Icon
+                                type={Icons.Feather}
+                                style={{ fontSize: 15, color: "red" }}
+                                name="map-pin"
+                            />{" "}
+                            {getLocation}
+                        </Text>
+                    </View>
+                ) : null}
 
                 <View style={{ flex: 1, alignItems: "flex-end" }}>
                     <TouchableOpacity

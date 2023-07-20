@@ -31,6 +31,11 @@ const statusPostSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'StatusPost',
         },
+        location: {
+            location: Boolean,
+            latitude: Number,
+            longitude: Number,
+        },
     },
     {
         timestamps: true,
