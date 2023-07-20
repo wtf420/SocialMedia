@@ -58,8 +58,6 @@ export const createNewPost = async (dataForm, userId, token) => {
             maxBodyLength: Infinity,
         });
 
-        console.log("result here");
-        console.log(result);
         return result;
     } catch (error) {
         console.log(error);
