@@ -17,10 +17,15 @@ import { RootState } from "../reducers/Store";
 import { setPostShow } from "../reducers/UtilsReducer";
 import Colors from "../constants/Colors";
 import * as ImagePicker from "expo-image-picker";
+import * as MediaLibrary from "expo-media-library";
 import { Toast } from "../components/ui/Toast";
 import { setStatus } from "../reducers/LoadingReducer";
-import VideoPlayer from "react-native-video-controls";
+import Video from "expo-av";
 import { createNewPost } from "../api/statusPostApi";
+import * as Location from "expo-location";
+import { add } from "react-native-reanimated";
+const { v4: uuidv4 } = require("uuid");
+
 function PostScreen() {
     const [mediaFiles, setMediaFiles] = useState([]);
     const [description, setDescription] = useState("");
@@ -30,6 +35,9 @@ function PostScreen() {
     const token = useSelector((state) => state.token.key);
     const uid = useSelector((state) => state.uid.id);
 
+    const [location, setLocation] = useState(null);
+    const [showLocation, setShowLocation] = useState(false);
+    const [getLocation, changeCurrentLocation] = useState(false);
     const dispatch = useDispatch();
 
     const toggleModal = () => {
@@ -42,16 +50,14 @@ function PostScreen() {
             return;
         }
 
-        console.log("description here:");
-        console.log(description);
-
         toggleModal();
         dispatch(setStatus(true));
 
         const dataForm = new FormData();
 
-        for (let i = 0; i < mediaFiles.length; i++)
+        for (let i = 0; i < mediaFiles.length; i++) {
             dataForm.append("media-files", mediaFiles[i]);
+        }
 
         dataForm.append("description", description);
 
@@ -90,7 +96,7 @@ function PostScreen() {
 
             const result = await ImagePicker.launchCameraAsync({
                 allowsEditing: false,
-                quality: 0.8,
+                quality: 1,
             });
 
             if (!result.canceled) {
@@ -98,8 +104,8 @@ function PostScreen() {
                     ...mediaFiles,
                     {
                         uri: result.uri,
-                        type: result.type,
-                        name: result.uri.split("/").pop(),
+                        type: "image/jpeg",
+                        name: uuidv4() + "_post-file",
                     },
                 ]);
             }
@@ -115,27 +121,30 @@ function PostScreen() {
         }
 
         try {
-            const { status } =
-                await ImagePicker.requestMediaLibraryPermissionsAsync();
+            const { status } = await MediaLibrary.requestPermissionsAsync();
             if (status !== "granted") {
                 Toast("Permission to access media library denied");
                 return;
             }
 
             const result = await ImagePicker.launchImageLibraryAsync({
-                allowsEditing: false,
                 mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: false,
                 quality: 0.8,
-                multiple: true,
+                allowsMultipleSelection: true,
             });
 
             if (!result.canceled) {
-                const selectedImages = result.selected.map((image) => ({
-                    uri: image.uri,
-                    type: "image/jpeg",
-                    name: "photo.jpg",
-                }));
-
+                var selectedImages = [];
+                let i = 1;
+                result.assets.forEach((image) => {
+                    selectedImages.push({
+                        uri: image.uri,
+                        type: "image/jpeg",
+                        name: uuidv4() + i + "_post-file",
+                    });
+                    i += 1;
+                });
                 setMediaFiles([...mediaFiles, ...selectedImages]);
             }
         } catch (error) {
@@ -166,9 +175,9 @@ function PostScreen() {
             if (!result.canceled) {
                 setMediaFiles([
                     {
-                        uri: result.uri,
-                        type: result.type,
-                        name: result.uri.split("/").pop(),
+                        uri: result.assets[0].uri,
+                        type: result.assets[0].type,
+                        name: result.assets[0].assetId,
                     },
                 ]);
             }
@@ -182,6 +191,54 @@ function PostScreen() {
         setMediaFiles([]);
     }, [postVisible]);
 
+    const toggleLocation = () => {
+        setShowLocation(!showLocation);
+    };
+
+    const postLocation = async () => {
+        if (!showLocation) {
+            try {
+                // Kiểm tra quyền truy cập vị trí của người dùng
+                const { status } =
+                    await Location.requestForegroundPermissionsAsync();
+                if (status !== "granted") {
+                    Toast("Permission to access location denied");
+                    return;
+                }
+
+                // Lấy thông tin vị trí hiện tại của người dùng
+                const location = await Location.getCurrentPositionAsync({});
+
+                // Lấy địa chỉ địa lý từ thông tin vị trí
+                const { latitude, longitude } = location.coords;
+                const newAddress = await Location.reverseGeocodeAsync({
+                    latitude,
+                    longitude,
+                });
+
+                // Chuyển đổi thông tin địa chỉ thành một chuỗi hiển thị dễ đọc
+                const formattedAddress =
+                    (newAddress[0].name ? newAddress[0].name + ", " : "") +
+                    (newAddress[0].street ? newAddress[0].street + ", " : "") +
+                    (newAddress[0].city ? newAddress[0].city + ", " : "") +
+                    (newAddress[0].region ? newAddress[0].region + ", " : "") +
+                    (newAddress[0].country ? newAddress[0].country : "");
+
+                // Cập nhật state selectedLocation với địa chỉ địa lý đã chọn
+                changeCurrentLocation("Đang ở " + formattedAddress);
+                setLocation(location);
+            } catch (error) {
+                // Xử lý lỗi nếu có
+                console.error("Error fetching location:", error);
+                Toast("Error fetching location");
+            }
+        } else {
+            changeCurrentLocation(null);
+        }
+        toggleLocation();
+        return getLocation;
+    };
+
     const MedifafileView = ({ item }) => {
         const screenWidth = Dimensions.get("window").width;
         return (
@@ -194,13 +251,10 @@ function PostScreen() {
                             width: screenWidth,
                         }}
                     >
-                        <VideoPlayer
-                            controls={true}
-                            disableFullscreen={true}
-                            disableBack={true}
+                        <Video
                             source={{ uri: item.uri }}
                             style={{ width: "100%", height: "100%" }}
-                            paused={true}
+                            useNativeControls
                         />
                     </View>
                 ) : (
@@ -263,6 +317,7 @@ function PostScreen() {
                                 flex: 1,
                             }}
                         >
+                            <Text>{getLocation}</Text>
                             <TextInput
                                 value={description}
                                 onChangeText={setDescription}
@@ -330,12 +385,11 @@ function PostScreen() {
                     >
                         <TouchableOpacity
                             style={{ marginTop: 5 }}
-                            onPress={() => {
-                                console.log(mediaFiles);
-                            }}
+                            onPress={() => postLocation()}
                         >
-                            <Icon type={Icons.Feather} name="clock" />
+                            <Icon type={Icons.Feather} name="map-pin" />
                         </TouchableOpacity>
+
                         <TouchableOpacity
                             onPress={postStatus}
                             style={{ marginLeft: 20 }}

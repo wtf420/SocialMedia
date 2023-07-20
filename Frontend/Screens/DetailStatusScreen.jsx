@@ -110,10 +110,9 @@ export default function DetailStatusScreen({ route }) {
                 token
             );
             if (response.status === 200) {
-                console.log(response.data);
                 const dataComment = response.data;
                 setComments((prevComments) => [...prevComments, dataComment]);
-                dispatch(incrementComment(item._id));
+                //dispatch(incrementComment(item._id));
             } else {
                 console.log(response.status);
                 throw new Error(response.data.errorMessage);
@@ -162,7 +161,7 @@ export default function DetailStatusScreen({ route }) {
             });
 
             if (!result.canceled) {
-                setMediaFile(result);
+                setMediaFile(result.assets[0]);
             }
         } catch (error) {
             Toast(error.message);
@@ -219,9 +218,9 @@ export default function DetailStatusScreen({ route }) {
             updateStatus();
         });
 
-        return () => {
-            focusListener.remove();
-        };
+        // return () => {
+        //     focusListener.remove();
+        // };
     }, [navigation, getComments, updateStatus]);
 
     return (
@@ -247,7 +246,7 @@ export default function DetailStatusScreen({ route }) {
                         <ItemComment
                             key={index}
                             item={comment}
-                            pressDeleteComment={() =>
+                            handleDeleteComment={() =>
                                 handleDeleteComment(comment._id)
                             }
                         />

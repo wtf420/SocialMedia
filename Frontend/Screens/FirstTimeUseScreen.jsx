@@ -78,17 +78,9 @@ function FirstTimeUseScreen({ navigation }) {
                 source={require("../assets/images/xiao.png")}
             >
                 <View style={[styles.viewSurround, { marginTop: 100 }]}>
-                    <Text style={styles.title}>
-                        Social media is not a media
-                    </Text>
+                    <Text style={styles.title}>Fakebook</Text>
                 </View>
 
-                <View style={[styles.viewSurround, { marginTop: 30 }]}>
-                    <Text style={styles.textOut}>
-                        {"              "}The key is to listen, engage, and
-                        build relationships
-                    </Text>
-                </View>
                 <View style={[styles.buttonContainer, { marginTop: 320 }]}>
                     <RectangleButton
                         style={styles.button}
@@ -258,6 +250,7 @@ const styles = StyleSheet.create({
         fontFamily: "Roboto",
         fontWeight: "bold",
         color: "#fff",
+        alignSelf: "center",
     },
     textOut: {
         fontSize: 18,

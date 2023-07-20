@@ -19,6 +19,7 @@ import { createStory } from "../api/storyApi";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../reducers/Store";
 import { setStatus } from "../reducers/LoadingReducer";
+const { v4: uuidv4 } = require("uuid");
 
 export default function PostStoryScreen({ navigation }) {
     const screenWidth = Dimensions.get("window").width;
@@ -47,18 +48,16 @@ export default function PostStoryScreen({ navigation }) {
             const result = await ImagePicker.launchImageLibraryAsync({
                 mediaTypes: ImagePicker.MediaTypeOptions.All,
                 allowsEditing: true,
-                aspect: [4, 3],
-                quality: 0.8,
+                quality: 1,
                 maxFiles: 10,
             });
 
             if (!result.canceled) {
                 const selectedMedia = {
                     uri: result.assets[0].uri,
-                    type: result.assets[0].type,
-                    name: result.assets[0].uri.split("/").pop(),
+                    type: "image/png",
+                    name: uuidv4() + "_story-file",
                 };
-                console.log(selectedMedia);
                 setMediaFiles(selectedMedia);
             }
         } catch (error) {
@@ -85,7 +84,6 @@ export default function PostStoryScreen({ navigation }) {
         navigateBack();
         dispatch(setStatus(true));
         const data = new FormData();
-        data.append("media-files", mediaFiles);
         if (mediaFiles?.type === "video/mp4") {
             const thumbnail = await MediaLibrary.getAssetAsync(mediaFiles.uri);
             data.append("media-files", {
@@ -111,7 +109,6 @@ export default function PostStoryScreen({ navigation }) {
             })
             .catch((error) => Toast(error.message))
             .finally(() => dispatch(setStatus(false)));
-        dispatch(setStatus(false));
     };
 
     const renderImage = (image) => {

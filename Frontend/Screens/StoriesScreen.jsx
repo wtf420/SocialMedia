@@ -34,7 +34,7 @@ export default function StoriesScreen({ navigation, route }) {
     const token = useSelector((state) => state.token.key);
     const uid = useSelector((state) => state.uid.id);
 
-    const flatListRef = useRef < FlatList < any >> null;
+    const flatListRef = useRef(null);
 
     const dispatch = useDispatch();
 
@@ -271,7 +271,6 @@ const styles = StyleSheet.create({
         color: Colors.white,
         fontSize: 16,
         marginLeft: 6,
-        fontFamily: "Roboto-Medium",
         fontWeight: "bold",
     },
     bottom: {

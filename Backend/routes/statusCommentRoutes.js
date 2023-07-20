@@ -20,9 +20,8 @@ router
     )
     .post(
         authController.isUser,
-        upload.any(),
-        s3Controller.uploadMediaFiles,
-        statusCommentController.createNewComment
+        upload.single('media-file'),
+        s3Controller.uploadCommentFile
     )
 
 router
