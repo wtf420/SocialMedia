@@ -65,6 +65,8 @@ function PostScreen() {
             dataForm.append("location", true);
             dataForm.append("latitude", location.coords.latitude);
             dataForm.append("longitude", location.coords.longitude);
+        } else {
+            dataForm.append("location", false);
         }
 
         createNewPost(dataForm, uid, token)

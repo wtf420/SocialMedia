@@ -196,26 +196,28 @@ export default function ShowPosts({
                 </View>
 
                 {item.location ? (
-                    <View style={{ flex: 1, alignItems: "flex-end" }}>
-                        <Text
-                            numberOfLines={2}
-                            style={{
-                                paddingLeft: 15,
-                                color: Colors.black,
-                                fontStyle: "italic",
-                                color: "gray",
-                                textAlign: "justify",
-                                width: 200,
-                            }}
-                        >
-                            <Icon
-                                type={Icons.Feather}
-                                style={{ fontSize: 15, color: "red" }}
-                                name="map-pin"
-                            />{" "}
-                            {getLocation}
-                        </Text>
-                    </View>
+                    item.location.location ? (
+                        <View style={{ flex: 1, alignItems: "flex-end" }}>
+                            <Text
+                                numberOfLines={2}
+                                style={{
+                                    paddingLeft: 15,
+                                    color: Colors.black,
+                                    fontStyle: "italic",
+                                    color: "gray",
+                                    textAlign: "justify",
+                                    width: 200,
+                                }}
+                            >
+                                <Icon
+                                    type={Icons.Feather}
+                                    style={{ fontSize: 15, color: "red" }}
+                                    name="map-pin"
+                                />{" "}
+                                {getLocation}
+                            </Text>
+                        </View>
+                    ) : null
                 ) : null}
 
                 <View style={{ flex: 1, alignItems: "flex-end" }}>
