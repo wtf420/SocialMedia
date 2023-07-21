@@ -336,7 +336,11 @@ export default function DetailStatusScreen({ route }) {
                     </View>
 
                     {!isFocused && !comment && !mediaFile && (
-                        <View style={{ padding: 10 }}>
+                        <View
+                            style={{
+                                padding: 10,
+                            }}
+                        >
                             <TouchableOpacity onPress={postComment}>
                                 <Text
                                     style={{
@@ -390,11 +394,17 @@ export default function DetailStatusScreen({ route }) {
                                 />
                             </TouchableOpacity>
                         </View>
-                        <View style={{ padding: 10 }}>
+                        <View
+                            style={{
+                                padding: 10,
+                                borderRadius: 30,
+                                borderWidth: 0.5,
+                            }}
+                        >
                             <TouchableOpacity onPress={postComment}>
                                 <Text
                                     style={{
-                                        color: Colors.bag10Bg,
+                                        color: Colors.bluePrimary,
                                         fontSize: 15,
                                         fontWeight: "bold",
                                     }}
