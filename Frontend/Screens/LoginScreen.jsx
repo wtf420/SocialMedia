@@ -9,6 +9,7 @@ import { setToken } from "../reducers/TokenReducer";
 import { setIdFromJwt } from "../reducers/UidReducer";
 import { setStatus } from "../reducers/LoadingReducer";
 import { Toast } from "../components/ui/Toast";
+import Colors from "../constants/Colors";
 
 function LoginScreen(props) {
     const [username, setUsername] = useState("");
@@ -107,7 +108,7 @@ function LoginScreen(props) {
                 <Pressable
                     onPress={handleLogin}
                     style={styles.button}
-                    android_ripple={{ color: "#613FC2", borderless: false }}
+                    android_ripple={{ color: Colors.primaryDark, borderless: false }}
                 >
                     <Text
                         style={[
@@ -148,7 +149,7 @@ const styles = StyleSheet.create({
         fontWeight: "700",
         fontSize: 32,
         lineHeight: 38,
-        color: "#416FDF",
+        color: Colors.primary,
     },
     textInput: {
         marginTop: 26,
@@ -173,7 +174,7 @@ const styles = StyleSheet.create({
         lineHeight: 19,
     },
     button: {
-        backgroundColor: "#416FDF",
+        backgroundColor: Colors.primary,
         padding: 18,
         elevation: 3,
     },

@@ -17,6 +17,7 @@ import {
   clearStatusPostsSub,
   pushStatusPostsSub,
 } from '../../reducers/StatusPostReducer';
+import Colors from '../../constants/Colors';
 const screenWidth = Dimensions.get('screen').width;
 
 const Post = ({ navigation, item }) => {
@@ -126,12 +127,12 @@ const ActivitySection = (props) => {
             borderRadius: 20,
             borderWidth: 1,
             overflow: 'hidden',
-            borderColor: '#0565a0ff',
+            borderColor: Colors.primary,
           }}
         >
           <Pressable
             onPress={viewStories}
-            android_ripple={{ color: '#7fc1ebff' }}
+            android_ripple={{ color: Colors.primary }}
             style={{
               backgroundColor: 'transparent',
               width: 100,
@@ -139,7 +140,7 @@ const ActivitySection = (props) => {
               justifyContent: 'center',
             }}
           >
-            <Text style={{ textAlign: 'center', fontSize: 18, color: '#0A66C2' }}>
+            <Text style={{ textAlign: 'center', fontSize: 18, color: Colors.primary }}>
               Stories
             </Text>
           </Pressable>
@@ -160,7 +161,7 @@ const ActivitySection = (props) => {
         style={{ justifyContent: 'center', alignItems: 'center' }}
       >
         <Text
-          style={[styles.title, { fontWeight: 'normal', marginVertical: 20 }]}
+          style={[styles.title, { fontWeight: 'normal', marginTop: 10 }]}
         >
           Show all activity ➔
         </Text>
@@ -196,13 +197,13 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: 'black',
   },
   numFollow: {
     fontWeight: 'bold',
-    color: '#4228e8',
+    color: Colors.primary,
   },
 });
 

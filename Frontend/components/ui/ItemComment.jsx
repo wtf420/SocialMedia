@@ -160,7 +160,7 @@ export default function ItemComment(props) {
             style={{
               fontSize: 15,
               fontWeight: '600',
-              color: isLike ? Colors.bluePrimary : Colors.grayPrimary,
+              color: isLike ? Colors.primary : Colors.grayPrimary,
             }}>
             Like
           </Text>
@@ -178,7 +178,7 @@ export default function ItemComment(props) {
                 type={Icons.AntDesign}
                 size={16}
                 name="like1"
-                color={Colors.irisBlue}
+                color={Colors.primary}
               />
               <Text style={{ fontWeight: '200', marginHorizontal: 5 }}>
                 {likeCount}

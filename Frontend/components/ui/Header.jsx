@@ -24,7 +24,7 @@ export default function Header({ navigation }) {
                     }}
                 >
                     <Image
-                        source={require("../../assets/images/wordpress.png")}
+                        source={require("../../assets/images/feelsguy.png")}
                         style={{ height: 35, width: 35, borderRadius: 100 }}
                     />
                 </TouchableOpacity>
@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
         flex: 1,
         marginHorizontal: 10,
         height: 40,
-        backgroundColor: Colors.gray,
+        backgroundColor: Colors.lightGray,
         borderRadius: 5,
         paddingHorizontal: 10,
         color: Colors.black,

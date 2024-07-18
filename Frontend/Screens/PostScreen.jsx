@@ -361,8 +361,9 @@ function PostScreen() {
             <View style={styles.topView}>
                 <View
                     style={{
-                        margin: 20,
+                        margin: 16,
                         flexDirection: "row",
+                        alignItems: "center",
                     }}
                 >
                     <TouchableOpacity
@@ -404,7 +405,7 @@ function PostScreen() {
                         >
                             <View
                                 style={{
-                                    backgroundColor: "#0085f1",
+                                    backgroundColor: Colors.primary,
                                     paddingHorizontal: 15,
                                     paddingVertical: 5,
                                     borderRadius: 15,
@@ -436,7 +437,7 @@ function PostScreen() {
             >
                 <View style={{ flexDirection: "row", padding: 20 }}>
                     <TouchableOpacity onPress={takePhotoFromCamera}>
-                        <Icon type={Icons.Entypo} name="camera" size={25} />
+                        <Icon type={Icons.Entypo} name="camera" size={25} color={Colors.primary}/>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={selectVideo}>
                         <Icon
@@ -444,13 +445,14 @@ function PostScreen() {
                             name="ios-videocam"
                             size={25}
                             style={{ marginLeft: 20 }}
+                            color={Colors.primary}
                         />
                     </TouchableOpacity>
                     <TouchableOpacity
                         onPress={choosePhotoFromLibrary}
                         style={{ marginLeft: 20 }}
                     >
-                        <Icon type={Icons.FontAwesome} name="photo" size={25} />
+                        <Icon type={Icons.FontAwesome} name="photo" size={25} color={Colors.primary}/>
                     </TouchableOpacity>
                     <View style={{ marginLeft: "auto" }}>
                         <TouchableOpacity style={{ flexDirection: "row" }}>
@@ -458,6 +460,7 @@ function PostScreen() {
                                 type={Icons.Ionicons}
                                 name="chatbox-ellipses"
                                 size={25}
+                                color={Colors.primary}
                             />
                             <Text style={{ marginLeft: 10 }}>Anyone</Text>
                         </TouchableOpacity>

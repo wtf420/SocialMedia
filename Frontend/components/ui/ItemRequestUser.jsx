@@ -53,7 +53,7 @@ export default function ItemRequestUser({
                 isFriend === 'false' ||
                 nameRequest === 'Accept' ||
                 nameRequest === 'Add Friend'
-                  ? '#000ed2'
+                  ? Colors.primary
                   : Colors.gray,
               overflow: 'hidden',
             }}>
@@ -66,7 +66,7 @@ export default function ItemRequestUser({
                   : true
               }
               onPress={pressLeft}
-              android_ripple={{ color: '#0073ff' }}
+              android_ripple={{ color: Colors.primary }}
               style={{
                 backgroundColor: 'transparent',
                 elevation: 2,

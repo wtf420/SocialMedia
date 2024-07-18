@@ -288,7 +288,7 @@ export default function ProfileOfUserScreen(props) {
                 overflow: "hidden",
                 backgroundColor:
                   nameTage1 === "Add Friend"
-                    ? "#0A66C2"
+                    ? Colors.primary
                     : nameTage1 === "Unfriend"
                     ? Colors.red
                     : "gray",
@@ -318,7 +318,7 @@ export default function ProfileOfUserScreen(props) {
                 width: 150,
                 borderRadius: 30,
                 borderWidth: 1,
-                borderColor: "#0A66C2",
+                borderColor: Colors.primary,
                 overflow: "hidden",
                 backgroundColor: "white",
                 marginHorizontal: 10
@@ -326,7 +326,7 @@ export default function ProfileOfUserScreen(props) {
             >
               <Pressable
                 onPress={handleRightButton}
-                android_ripple={{ color: "#0d8fe0ff" }}
+                android_ripple={{ color: Colors.accent }}
                 style={{
                   backgroundColor: "transparent",
                   width: 150,
@@ -338,7 +338,7 @@ export default function ProfileOfUserScreen(props) {
                   style={{
                     textAlign: "center",
                     fontSize: 18,
-                    color: "#0A66C2"
+                    color: Colors.primary
                   }}
                 >
                   {nameTage2}
@@ -363,7 +363,7 @@ export default function ProfileOfUserScreen(props) {
                     navigation.navigate("chat", { id: id })
                   else Toast("You are not friend with this user")
                 }}
-                android_ripple={{ color: "#0d8fe0ff" }}
+                android_ripple={{ color: Colors.accent }}
                 style={{
                   backgroundColor: "transparent",
                   width: 35,
@@ -438,7 +438,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 5,
     left: 100,
-    backgroundColor: "#0A66C2",
+    backgroundColor: Colors.primary,
     borderRadius: 20,
     borderColor: "white",
     borderWidth: 5,
@@ -455,7 +455,7 @@ const styles = StyleSheet.create({
     marginLeft: 25
   },
   btnLogout: {
-    backgroundColor: Colors.skyBlue,
+    backgroundColor: Colors.primaryDark,
     padding: 18,
     elevation: 3
   },

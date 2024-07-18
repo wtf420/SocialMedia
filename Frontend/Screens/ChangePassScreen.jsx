@@ -12,6 +12,7 @@ import { Toast } from "../components/ui/Toast";
 import {changePassword} from '../api/Utils';
 import { useDispatch } from "react-redux";
 import { setStatus } from "../reducers/LoadingReducer";
+import Colors from "../constants/Colors";
 
 export default function ChangePassCreen(props) {
     const { handleCloseModal } = props;
@@ -256,7 +257,7 @@ export default function ChangePassCreen(props) {
                 <Pressable
                     style={styles.button}
                     onPress={handleChange}
-                    android_ripple={{ color: "#613FC2", borderless: false }}
+                    android_ripple={{ color: Colors.primaryDark, borderless: false }}
                 >
                     <Text
                         style={[
@@ -296,7 +297,7 @@ const styles = StyleSheet.create({
         fontWeight: "700",
         fontSize: 32,
         lineHeight: 38,
-        color: "#416FDF",
+        color: Colors.primary,
     },
     textInput: {
         marginTop: 26,
@@ -321,7 +322,7 @@ const styles = StyleSheet.create({
         lineHeight: 19,
     },
     button: {
-        backgroundColor: "#416FDF",
+        backgroundColor: Colors.primary,
         padding: 18,
         elevation: 3,
     },

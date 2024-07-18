@@ -92,7 +92,7 @@ import {
             <Pressable
               onPress={sharePost}
               style={styles.btnShare}
-              android_ripple={{ color: Colors.moodyBlue, borderless: true }}
+              android_ripple={{ color: Colors.primaryDark, borderless: true }}
             >
               <Text style={styles.textShare}>Share Now</Text>
             </Pressable>
@@ -153,7 +153,7 @@ import {
       borderRadius: 7
     },
     btnShare: {
-      backgroundColor: Colors.bluePrimary,
+      backgroundColor: Colors.primary,
       padding: 10
     },
     textShare: {

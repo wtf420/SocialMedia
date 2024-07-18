@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     marginTop: 26,
-    width: 300,
+    width: 320,
   },
   input: {
     borderWidth: 1,

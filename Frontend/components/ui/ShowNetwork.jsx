@@ -93,7 +93,7 @@ export default function ShowNetwork(props) {
           style={{
             bottom: 10,
             borderWidth: 1,
-            borderColor: Colors.bluePrimary,
+            borderColor: Colors.primary,
             borderRadius: 50,
             paddingHorizontal: 30,
             paddingVertical: 2,
@@ -104,7 +104,7 @@ export default function ShowNetwork(props) {
             style={{
               fontSize: 19,
               fontWeight: "bold",
-              color: Colors.bluePrimary
+              color: Colors.primary
             }}
           >
             View

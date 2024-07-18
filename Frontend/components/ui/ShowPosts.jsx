@@ -240,7 +240,7 @@ export default function ShowPosts({
             {item.description ? (
                 <TouchableOpacity
                     onPress={() => setShowMore(!showMore)}
-                    style={{ marginVertical: 10, paddingHorizontal: 16 }}
+                    style={{ marginVertical: 10, paddingHorizontal: 20 }}
                 >
                     <Text
                         onTextLayout={onTextLayout}
@@ -348,8 +348,9 @@ export default function ShowPosts({
                         Styles.flexCenter,
                         {
                             justifyContent: "space-between",
-                            paddingHorizontal: 10,
+                            paddingHorizontal: 16,
                             paddingTop: 5,
+                            marginBottom: 5,
                         },
                     ]}
                 >
@@ -357,10 +358,11 @@ export default function ShowPosts({
                         <Icon
                             type={Icons.AntDesign}
                             name="like1"
-                            color={Colors.irisBlue}
+                            color={Colors.primaryDark}
                             style={{ height: 25, width: 25, borderRadius: 100 }}
                         />
-                        <Text>{item.likeCount} likes</Text>
+                        <Text
+                            style={{marginLeft: 5}}>{item.likeCount} likes</Text>
                     </View>
                     <View style={Styles.flexCenter}>
                         {item.commentCount > 0 ? (
@@ -394,7 +396,8 @@ export default function ShowPosts({
                     Styles.flexCenter,
                     {
                         justifyContent: "space-between",
-                        paddingHorizontal: 40,
+                        paddingHorizontal: 30,
+                        paddingTop: 5,
                     },
                 ]}
             >
@@ -406,11 +409,11 @@ export default function ShowPosts({
                         type={Icons.Entypo}
                         name="thumbs-up"
                         size={19}
-                        color={item.isLiked ? Colors.skyBlue : Colors.gray}
+                        color={item.isLiked ? Colors.primary : Colors.gray}
                     />
                     <Text
                         style={{
-                            color: item.isLiked ? Colors.skyBlue : Colors.gray,
+                            color: item.isLiked ? Colors.primary : Colors.black,
                             marginHorizontal: 5,
                         }}
                     >

@@ -318,10 +318,7 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
         borderRadius: 10,
         height: 205,
-    },
-    titleContainer: {
-        backgroundColor: "white",
-        padding: 12,
+        paddingHorizontal: 10,
     },
     title: {
         color: "white",
@@ -331,7 +328,7 @@ const styles = StyleSheet.create({
     storiesContainer: {
         backgroundColor: "white",
         paddingVertical: 12,
-        marginTop: 12,
+        marginTop: 6,
     },
     imageStory: {
         height: 170,
@@ -352,7 +349,7 @@ const styles = StyleSheet.create({
         width: 44,
         borderRadius: 22,
         position: "absolute",
-        backgroundColor: "#3b5998",
+        backgroundColor: "#50B498",
         justifyContent: "center",
         alignItems: "center",
         left: 12,
@@ -391,9 +388,9 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 8,
     },
     plus: {
-        backgroundColor: "#3b5998",
-        height: 26,
-        width: 26,
+        backgroundColor: "#50B498",
+        height: 27,
+        width: 27,
         justifyContent: "center",
         alignItems: "center",
         borderRadius: 13,
@@ -407,8 +404,8 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: "bold",
         position: "absolute",
-        top: -3,
-        left: 6,
+        top: -9,
+        left: 3,
     },
     createStoryTxtContainer: {
         width: 100,

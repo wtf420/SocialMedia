@@ -75,7 +75,7 @@ function FirstTimeUseScreen({ navigation }) {
             <ImageBackground
                 resizeMode={"stretch"}
                 style={styles.image}
-                source={require("../assets/images/xiao.png")}
+                source={require("../assets/images/wp2855598.jpg")}
             >
                 <View style={[styles.viewSurround, { marginTop: 100 }]}>
                     <Text style={styles.title}>Fakebook</Text>
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
     },
     button: {
         width: 200,
-        height: 40,
+        height: 50,
     },
     lastView: {
         borderColor: "white",

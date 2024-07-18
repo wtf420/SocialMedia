@@ -319,7 +319,7 @@ function ProfileScreen({ navigation }) {
                     <Pressable
                         onPress={handleLogout}
                         style={styles.btnLogout}
-                        android_ripple={{ color: "#613FC2", borderless: false }}
+                        android_ripple={{ color: Colors.primary, borderless: false }}
                     >
                         <Text
                             style={[
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
         position: "absolute",
         bottom: 5,
         left: 100,
-        backgroundColor: "#0A66C2",
+        backgroundColor: Colors.primary,
         borderRadius: 20,
         borderColor: "white",
         borderWidth: 5,
@@ -401,8 +401,8 @@ const styles = StyleSheet.create({
         marginLeft: 25,
     },
     btnLogout: {
-        backgroundColor: Colors.skyBlue,
-        padding: 18,
+        backgroundColor: Colors.primaryDark,
+        padding: 15,
         elevation: 3,
     },
     fontText: {

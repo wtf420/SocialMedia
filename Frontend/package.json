@@ -47,7 +47,9 @@
     "react-native-webrtc": "^111.0.3",
     "react-redux": "^8.1.1",
     "redux": "^4.2.1",
-    "socket.io-client": "^4.7.1"
+    "socket.io-client": "^4.7.1",
+    "react-native-web": "~0.18.10",
+    "@expo/webpack-config": "^18.0.1"
   },
   "private": true,
   "devDependencies": {

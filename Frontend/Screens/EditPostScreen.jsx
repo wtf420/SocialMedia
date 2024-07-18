@@ -162,7 +162,8 @@ import {
           <View
             style={{
               margin: 20,
-              flexDirection: "row"
+              flexDirection: "row",
+              alignItems: "center",
             }}
           >
             <TouchableOpacity onPress={navigateBack} style={{ marginTop: 3 }}>

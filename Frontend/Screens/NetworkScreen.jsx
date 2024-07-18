@@ -9,6 +9,7 @@ import {
 import React, { useState } from "react";
 import Icon, { Icons } from "../components/ui/Icons";
 import FriendList from "../components/ui/FriendList";
+import Colors from "../constants/Colors";
 
 function NetworkScreen({ navigation }) {
     return (
@@ -52,11 +53,12 @@ const styles = StyleSheet.create({
         margin: 20,
         flexDirection: "row",
         justifyContent: "space-between",
+        alignItems: "center",
     },
     title: {
-        color: "#0A66C2",
+        color: Colors.primary,
         fontSize: 20,
-        fontWeight: "bold",
+        fontWeight: "semibold",
     },
     circle: {
         backgroundColor: "white",

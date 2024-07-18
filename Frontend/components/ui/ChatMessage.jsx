@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import { Image } from "react-native-animatable";
+import Colors from "../../constants/Colors";
 
 export default function ChatMessage({ chat, userId, avatarSource }) {
     const status = chat.senderId !== userId;
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
     },
     mmessage: {
         maxWidth: "50%",
-        backgroundColor: "#f5ccc2",
+        backgroundColor: Colors.primaryLite,
         padding: 15,
         borderRadius: 10,
         marginBottom: 2,
